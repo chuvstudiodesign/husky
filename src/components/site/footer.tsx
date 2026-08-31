@@ -36,7 +36,7 @@ export function Footer() {
               <Image
                 src="/brand/icon/husky-mark-orange.svg"
                 alt=""
-                width={32}
+                width={26}
                 height={32}
                 className="h-8 w-auto"
               />

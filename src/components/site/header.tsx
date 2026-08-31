@@ -51,13 +51,19 @@ export function Header() {
           className="flex items-center gap-3"
           aria-label="Husky Audio Video, home"
         >
+          {/* The mark is 308x372, not square. Declaring it square made Next warn
+              that one dimension was being overridden by CSS, and would distort it
+              anywhere the class did not apply.
+
+              No `priority`: it emits a preload for a 6KB inline-simple SVG that
+              the browser then reports as unused. The preload costs more than it
+              saves at this size. */}
           <Image
             src="/brand/icon/husky-mark-orange.svg"
             alt=""
-            width={30}
+            width={25}
             height={30}
             className="h-[30px] w-auto"
-            priority
           />
           <span className="font-display text-lg leading-none font-bold tracking-tight">
             HUSKY

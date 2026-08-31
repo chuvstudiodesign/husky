@@ -51,6 +51,36 @@ const components = [
     from: "Figma — 01 Logo System",
   },
   {
+    name: "Smooth Scroll",
+    href: "/styleguide/modern/smooth-scroll",
+    line: "Momentum scrolling that interpolates the native position instead of replacing it.",
+    from: "Lenis",
+  },
+  {
+    name: "Parallax",
+    href: "/styleguide/modern/parallax",
+    line: "Drifts a child as its block passes through the viewport.",
+    from: "Skiper UI parallax scenes",
+  },
+  {
+    name: "Text Reveal Scroll",
+    href: "/styleguide/modern/text-reveal-scroll",
+    line: "A passage that brightens word by word as the reader scrolls through it.",
+    from: "Skiper UI text reveal · GSAP ScrollTrigger",
+  },
+  {
+    name: "Image Reveal",
+    href: "/styleguide/modern/image-reveal",
+    line: "Unmasks an image from one edge as it enters view.",
+    from: "Skiper UI image reveal",
+  },
+  {
+    name: "Fold Text",
+    href: "/styleguide/modern/fold-text",
+    line: "A headline folding into place, each word rotating up from flat.",
+    from: "React Bits FoldText",
+  },
+  {
     name: "Grain",
     href: "/styleguide/modern/grain",
     line: "A few percent of film noise over the page, to stop dark surfaces banding.",
@@ -63,7 +93,7 @@ export default function ModernOverviewPage() {
     <ShowcasePage>
       <ShowcaseHeader
         title="Modern Components"
-        description="Eight motion components built for the marketing site. Each takes a pattern from a contemporary React library and rebuilds it against the Husky token contract — so nothing here carries a colour, radius or typeface that isn't already in the design system."
+        description="Thirteen motion components built for the marketing site. Each takes a pattern from a contemporary React library and rebuilds it against the Husky token contract — so nothing here carries a colour, radius or typeface that isn't already in the design system."
         importPath={`import { Reveal } from "@/components/motion-ui/reveal"
 // …each lives in its own file under src/components/motion-ui/`}
       />
