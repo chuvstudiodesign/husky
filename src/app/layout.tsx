@@ -37,6 +37,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`dark ${outfit.variable} ${geistSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
+      data-scroll-behavior="smooth"
     >
       <head>
         {/*

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { HalfMark } from "@/components/motion-ui/half-mark";
-import { SmoothScroll } from "@/components/motion-ui/smooth-scroll";
 import { Hero } from "@/components/sections/v1/hero";
 import { Stats } from "@/components/sections/v1/stats";
 import { Services } from "@/components/sections/v1/services";
@@ -30,23 +29,21 @@ export const metadata: Metadata = {
  *   Approach  the one scroll-linked passage, lit word by word
  *   Showcase  the page's single photograph, unmasked and drifting
  *
- * Wrapped in Lenis for momentum. Anchors, find-in-page and keyboard scrolling all
- * keep working, and the whole thing switches off under reduced motion.
+ * Momentum scrolling now comes from the shared site layout rather than from here,
+ * so every route gets it.
  */
 export default function Site1Page() {
   return (
-    <SmoothScroll>
-      <div className="relative">
-        <HalfMark />
-        <Hero />
-        <Stats />
-        <Services />
-        <Approach />
-        <Partners />
-        <Showcase />
-        <About />
-        <Contact />
-      </div>
-    </SmoothScroll>
+    <div className="relative">
+      <HalfMark />
+      <Hero />
+      <Stats />
+      <Services />
+      <Approach />
+      <Partners />
+      <Showcase />
+      <About />
+      <Contact />
+    </div>
   );
 }

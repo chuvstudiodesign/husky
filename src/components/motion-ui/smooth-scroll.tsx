@@ -65,7 +65,10 @@ export function SmoothScroll({
       const target = document.querySelector(hash);
       if (!target) return;
       e.preventDefault();
-      lenis.scrollTo(target as HTMLElement, { offset: -80 });
+      // No offset here: `section[id] { scroll-margin-top: 5rem }` in globals.css
+      // already clears the fixed header, and Lenis honours scroll-margin. Adding
+      // one on top of the other landed every anchor 80px too low.
+      lenis.scrollTo(target as HTMLElement);
     };
 
     document.addEventListener("click", onClick);
