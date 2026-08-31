@@ -63,7 +63,11 @@ export function Hero() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.42} className="mt-12">
+        {/* The button row is the one entrance the phone skips: on a small
+            screen the pair sits close under the lead paragraph, and a fourth
+            staggered fade there reads as lag rather than choreography. It is
+            rendered in its final state below md; desktop keeps the reveal. */}
+        <Reveal delay={0.42} className="mt-12" data-reveal-mobile="off">
           <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
             <Magnetic strength={0.2}>
               <Button asChild size="lg" className="h-12 px-7 text-[15px]">

@@ -568,6 +568,21 @@
   }
 }
 
+/* Per-element opt-out, phones only.
+
+   `data-reveal-mobile="off"` keeps the element in its final state below the md
+   breakpoint: present, in place, no travel and no fade. Desktop is untouched.
+
+   Unlayered and declared after the block above, so it wins on cascade order at
+   equal specificity — the same way the reduced-motion block below does. */
+@media (max-width: 767px) {
+  [data-reveal][data-reveal-mobile="off"] {
+    opacity: 1;
+    translate: none;
+    transition: none;
+  }
+}
+
 /* Reduced motion: everything present, in place, with no travel. */
 @media (prefers-reduced-motion: reduce) {
   [data-reveal],

@@ -27,6 +27,13 @@ export interface HalfMarkProps extends React.ComponentProps<"div"> {
   /** Pixels of scroll before it docks or recedes. */
   threshold?: number;
   /**
+   * Extra distance the resting mark drops below centre on a phone, as a
+   * percentage of its own height. Applies only to the rest state — the docked
+   * badge is pinned to the bottom-right corner and is unaffected. Defaults to
+   * 0, so a caller has to ask for the drop.
+   */
+  mobileDrop?: number;
+  /**
    * Element ids the mark repaints dark over. Pass `[]` to keep it in brand colour
    * for the whole page.
    */
@@ -54,7 +61,9 @@ export interface HalfMarkProps extends React.ComponentProps<"div"> {
  *     line.
  *
  *   · **Mobile offset.** At rest on a phone the mark sits 10px below centre, which
- *     drops the ears clear of the headline.
+ *     drops the ears clear of the headline. `mobileDrop` pushes it further down
+ *     from there, in percent of the mark's own height — rest state only, so the
+ *     docked badge in the corner keeps its position either way.
  *
  * Every state is written out per breakpoint rather than inherited, because a
  * half-specified variant silently keeps a value from the other branch — which is
@@ -69,6 +78,7 @@ export function HalfMark({
   mobileHeight = 49.4,
   dockedSize = 70,
   threshold = 8,
+  mobileDrop = 0,
   darkOver = DEFAULT_DARK_OVER,
   className,
   style,
@@ -145,8 +155,9 @@ export function HalfMark({
               "md:top-1/2 md:right-0 md:bottom-auto md:h-[var(--mark-h)] md:translate-x-1/2 md:-translate-y-1/2 md:opacity-10",
             ]
           : [
-              // Phone at rest sits 10px below centre; desktop stays centred.
-              "top-1/2 right-0 bottom-auto h-[var(--mark-h-sm)] translate-x-1/2 -translate-y-[calc(50%-10px)] opacity-100",
+              // Phone at rest sits 10px below centre, then drops a further
+              // --mark-drop of its own height; desktop stays centred.
+              "top-1/2 right-0 bottom-auto h-[var(--mark-h-sm)] translate-x-1/2 -translate-y-[calc(50%-10px-var(--mark-drop))] opacity-100",
               "md:h-[var(--mark-h)] md:-translate-y-1/2",
             ],
         className,
@@ -156,6 +167,7 @@ export function HalfMark({
           "--mark-h": `${height}vh`,
           "--mark-h-sm": `${mobileHeight}vh`,
           "--mark-docked": `${dockedSize}px`,
+          "--mark-drop": `${mobileDrop}%`,
           ...style,
         } as React.CSSProperties
       }
