@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import type { MotionValue } from "motion/react";
 
 import { cn } from "@/lib/utils";
@@ -44,7 +44,14 @@ function Word({
  * being a moment and becomes a tic.
  *
  * The text stays a normal string in the DOM, so it is selectable, searchable and
- * read as one sentence. Under reduced motion every word is simply at full opacity.
+ * read as one sentence.
+ *
+ * **Reduced motion is handled in CSS, not here, and that is deliberate.**
+ * `useReducedMotion()` resolves to null on the server and true on the client, so
+ * using it to pick either a different tree *or* a different style value guarantees
+ * a hydration mismatch for exactly the people who asked for less movement. The
+ * markup is therefore identical in both places, and the
+ * `prefers-reduced-motion` block in globals.css pins every word to full opacity.
  */
 export function TextRevealScroll({
   children,
@@ -52,7 +59,6 @@ export function TextRevealScroll({
   from = 0.15,
 }: TextRevealScrollProps) {
   const ref = useRef<HTMLParagraphElement>(null);
-  const reduced = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -63,26 +69,22 @@ export function TextRevealScroll({
 
   const words = children.split(" ");
 
-  if (reduced) {
-    return <p className={cn(className)}>{children}</p>;
-  }
-
   return (
-    <p ref={ref} className={cn("flex flex-wrap", className)}>
-      {words.map((word, i) => {
-        const start = i / words.length;
-        const end = (i + 1) / words.length;
-        return (
-          <Word
-            key={`${word}-${i}`}
-            progress={scrollYProgress}
-            range={[start, end]}
-            from={from}
-          >
-            {word}
-          </Word>
-        );
-      })}
+    <p
+      ref={ref}
+      data-text-reveal=""
+      className={cn("flex flex-wrap", className)}
+    >
+      {words.map((word, i) => (
+        <Word
+          key={`${word}-${i}`}
+          progress={scrollYProgress}
+          range={[i / words.length, (i + 1) / words.length]}
+          from={from}
+        >
+          {word}
+        </Word>
+      ))}
     </p>
   );
 }

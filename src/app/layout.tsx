@@ -39,22 +39,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
       data-scroll-behavior="smooth"
     >
-      <head>
-        {/*
-          Marks that scripting is available, before first paint.
-
-          Scroll-reveal hides its starting state behind `html.js`, so the server's
-          markup is fully visible and stays that way if scripts are blocked, fail,
-          or simply haven't run. Because this runs synchronously in <head>, the
-          class lands before the first paint — so when JS *is* present there is no
-          flash of visible-then-hidden content either.
-        */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `document.documentElement.classList.add('js')`,
-          }}
-        />
-      </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
   );

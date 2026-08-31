@@ -29,6 +29,8 @@ export const navigation: NavSection[] = [
       { name: "Text Reveal Scroll", href: "/styleguide/modern/text-reveal-scroll" },
       { name: "Image Reveal", href: "/styleguide/modern/image-reveal" },
       { name: "Fold Text", href: "/styleguide/modern/fold-text" },
+      { name: "Section Index", href: "/styleguide/modern/section-index" },
+      { name: "Expanding List", href: "/styleguide/modern/expanding-list" },
       { name: "Grain", href: "/styleguide/modern/grain" },
     ],
   },
