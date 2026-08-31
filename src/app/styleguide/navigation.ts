@@ -23,7 +23,7 @@ export const navigation: NavSection[] = [
       { name: "Marquee", href: "/styleguide/modern/marquee" },
       { name: "Spotlight Card", href: "/styleguide/modern/spotlight-card" },
       { name: "Magnetic", href: "/styleguide/modern/magnetic" },
-      { name: "Angular Pattern", href: "/styleguide/modern/angular-pattern" },
+      { name: "Half Mark", href: "/styleguide/modern/half-mark" },
       { name: "Grain", href: "/styleguide/modern/grain" },
     ],
   },

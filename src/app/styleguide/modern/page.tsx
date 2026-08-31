@@ -45,10 +45,10 @@ const components = [
     from: "Common in award-site interaction kits",
   },
   {
-    name: "Angular Pattern",
-    href: "/styleguide/modern/angular-pattern",
-    line: "The brand's 45° bracket, used as structural graphic in place of photography.",
-    from: "Figma — 04 Brand Pattern System",
+    name: "Half Mark",
+    href: "/styleguide/modern/half-mark",
+    line: "The Husky wolf bisected by the edge of the frame, fixed and reacting to scroll.",
+    from: "Figma — 01 Logo System",
   },
   {
     name: "Grain",
@@ -148,7 +148,7 @@ export default function ModernOverviewPage() {
       <ShowcaseSection title="Accessibility">
         <A11yNotes
           notes={[
-            "Decorative components — AngularPattern, Grain, ScrollProgress — are aria-hidden and carry no semantics. Nothing depends on seeing them.",
+            "Decorative components — HalfMark, Grain, ScrollProgress — are aria-hidden and carry no semantics. Nothing depends on seeing them.",
             "SplitText keeps the whole string as an aria-label, so a screen reader reads a sentence rather than a pile of word fragments.",
             "Counter exposes the final value as its accessible name; assistive technology never reads a ticking number.",
             "Marquee is the one infinite loop in the system. It stops on hover and stops entirely under reduced motion — continuous movement is a genuine problem for vestibular sensitivity, not a taste question.",
