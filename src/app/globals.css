@@ -1,26 +1,553 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ============================================================
+   HUSKY AUDIO VIDEO — DESIGN SYSTEM v2.4 [S.FL]
+   Luxury Smart Home Automation
+   Source of truth: Figma "Husky" — 08 Section System (rules 01–03)
+   ------------------------------------------------------------
+   RULE 01  Background  #090A0F   absolute dark foundation
+   RULE 02  Card/Frame  #11131C   component surface container fill
+   RULE 03  Radius      5px MAX   strict aesthetic constant
+   ============================================================ */
 
 :root {
+  /* === BRAND RAW (immutable, from source vectors) === */
+  --brand-orange: #ec663d;
+  --brand-navy: #15243d;
+  --brand-light: #dfdfdf;
+  --brand-black: #090a0f;
+  --brand-surface: #11131c;
+
+  /* === PRIMARY SCALE — Husky Orange (anchor 500) === */
+  --husky-50: #fff2ee;
+  --husky-100: #ffe3da;
+  --husky-200: #ffccbc;
+  --husky-300: #feac94;
+  --husky-400: #fb8460;
+  --husky-500: #ec663d;
+  --husky-600: #c8491f;
+  --husky-700: #a43812;
+  --husky-800: #80290b;
+  --husky-900: #5a1a05;
+
+  /* === NAVY SCALE — Husky Navy (anchor 900) === */
+  --navy-50: #f1f6fe;
+  --navy-100: #e1eaf9;
+  --navy-200: #cadaf5;
+  --navy-300: #adc5ec;
+  --navy-400: #8dacde;
+  --navy-500: #6d8fc6;
+  --navy-600: #5979ad;
+  --navy-700: #46618e;
+  --navy-800: #354b6e;
+  --navy-900: #15243d;
+
+  /* === NEUTRAL SCALE — cool navy-tinted grey === */
+  --grey-50: #f3f6fa;
+  --grey-100: #e7eaef;
+  --grey-200: #d5d9e1;
+  --grey-300: #bec4cd;
+  --grey-400: #a4abb7;
+  --grey-500: #878e9a;
+  --grey-600: #727984;
+  --grey-700: #5b616b;
+  --grey-800: #454b53;
+  --grey-900: #2f3339;
+
+  /* ---------- LIGHT THEME (logo variants 02/03/04: on light & on grey) ---------- */
+
+  /* === BASE === */
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #15243d;
+
+  /* === CARD === */
+  --card: #f3f6fa;
+  --card-foreground: #15243d;
+
+  /* === POPOVER / DROPDOWN / TOOLTIP === */
+  --popover: #ffffff;
+  --popover-foreground: #15243d;
+
+  /* === PRIMARY (main brand color) === */
+  --primary: #ec663d;
+  --primary-foreground: #ffffff;
+
+  /* === SECONDARY === */
+  --secondary: #e7eaef;
+  --secondary-foreground: #15243d;
+
+  /* === MUTED === */
+  --muted: #f3f6fa;
+  --muted-foreground: #5b616b;
+
+  /* === ACCENT === */
+  --accent: #ffe3da;
+  --accent-foreground: #a43812;
+
+  /* === DESTRUCTIVE === */
+  --destructive: #d92d20;
+  --destructive-foreground: #ffffff;
+
+  /* === BORDERS & INPUTS === */
+  --border: #d5d9e1;
+  --input: #bec4cd;
+  --ring: #ec663d;
+
+  /* === BORDER RADIUS — RULE 03: 5px hard ceiling === */
+  --radius: 0.3125rem; /* 5px */
+
+  /* === CHART COLORS === */
+  --chart-1: #ec663d;
+  --chart-2: #15243d;
+  --chart-3: #5979ad;
+  --chart-4: #fb8460;
+  --chart-5: #878e9a;
+
+  /* === SIDEBAR === */
+  --sidebar: #f3f6fa;
+  --sidebar-foreground: #15243d;
+  --sidebar-primary: #ec663d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #e7eaef;
+  --sidebar-accent-foreground: #15243d;
+  --sidebar-border: #d5d9e1;
+  --sidebar-ring: #ec663d;
+
+  /* === CUSTOM SEMANTIC COLORS === */
+  --success: #047857;
+  --success-foreground: #ffffff;
+  --warning: #b45309;
+  --warning-foreground: #ffffff;
+  --info: #46618e;
+  --info-foreground: #ffffff;
+
+  /* === ELEVATION — the system is flat; separation comes from 1px borders === */
+  --shadow-flat: none;
+  --shadow-subtle: 0 1px 2px 0 rgb(21 36 61 / 0.06);
+  --shadow-raised: 0 2px 8px -2px rgb(21 36 61 / 0.10);
+  --shadow-overlay: 0 8px 28px -8px rgb(21 36 61 / 0.18);
+}
+
+/* ---------- DARK THEME — the canonical Husky system (Figma default) ---------- */
+.dark {
+  /* === BASE — RULE 01 === */
+  --background: #090a0f;
+  --foreground: #ffffff;
+
+  /* === CARD — RULE 02 === */
+  --card: #11131c;
+  --card-foreground: #ffffff;
+
+  /* === POPOVER / DROPDOWN / TOOLTIP === */
+  --popover: #11131c;
+  --popover-foreground: #ffffff;
+
+  /* === PRIMARY === */
+  --primary: #ec663d;
+  --primary-foreground: #ffffff;
+
+  /* === SECONDARY === */
+  --secondary: #1a1d29;
+  --secondary-foreground: #ffffff;
+
+  /* === MUTED === */
+  --muted: #1a1d29;
+  --muted-foreground: #8e9bb0;
+
+  /* === ACCENT === */
+  --accent: #22262f;
+  --accent-foreground: #fb8460;
+
+  /* === DESTRUCTIVE === */
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  /* === BORDERS & INPUTS === */
+  --border: rgb(255 255 255 / 0.08);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #ec663d;
+
+  /* === CHART COLORS === */
+  --chart-1: #ec663d;
+  --chart-2: #6d8fc6;
+  --chart-3: #10b981;
+  --chart-4: #fb8460;
+  --chart-5: #8e9bb0;
+
+  /* === SIDEBAR === */
+  --sidebar: #11131c;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ec663d;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1d29;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #ec663d;
+
+  /* === CUSTOM SEMANTIC COLORS === */
+  --success: #10b981;
+  --success-foreground: #050b08;
+  --warning: #f59e0b;
+  --warning-foreground: #0f0a02;
+  --info: #6d8fc6;
+  --info-foreground: #060a12;
+
+  /* === ELEVATION === */
+  --shadow-flat: none;
+  --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.40);
+  --shadow-raised: 0 2px 8px -2px rgb(0 0 0 / 0.55);
+  --shadow-overlay: 0 8px 28px -8px rgb(0 0 0 / 0.70);
 }
 
 @theme inline {
+  /* --- Core surface tokens --- */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* --- Chart --- */
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* --- Sidebar --- */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  /* --- Extra semantics --- */
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-info: var(--info);
+  --color-info-foreground: var(--info-foreground);
+
+  /* --- Brand scales exposed as utilities (bg-husky-500, text-navy-900, …) --- */
+  --color-husky-50: var(--husky-50);
+  --color-husky-100: var(--husky-100);
+  --color-husky-200: var(--husky-200);
+  --color-husky-300: var(--husky-300);
+  --color-husky-400: var(--husky-400);
+  --color-husky-500: var(--husky-500);
+  --color-husky-600: var(--husky-600);
+  --color-husky-700: var(--husky-700);
+  --color-husky-800: var(--husky-800);
+  --color-husky-900: var(--husky-900);
+
+  --color-navy-50: var(--navy-50);
+  --color-navy-100: var(--navy-100);
+  --color-navy-200: var(--navy-200);
+  --color-navy-300: var(--navy-300);
+  --color-navy-400: var(--navy-400);
+  --color-navy-500: var(--navy-500);
+  --color-navy-600: var(--navy-600);
+  --color-navy-700: var(--navy-700);
+  --color-navy-800: var(--navy-800);
+  --color-navy-900: var(--navy-900);
+
+  --color-grey-50: var(--grey-50);
+  --color-grey-100: var(--grey-100);
+  --color-grey-200: var(--grey-200);
+  --color-grey-300: var(--grey-300);
+  --color-grey-400: var(--grey-400);
+  --color-grey-500: var(--grey-500);
+  --color-grey-600: var(--grey-600);
+  --color-grey-700: var(--grey-700);
+  --color-grey-800: var(--grey-800);
+  --color-grey-900: var(--grey-900);
+
+  /* --- Typography --- */
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, monospace;
+  --font-display: var(--font-outfit), var(--font-geist-sans), ui-sans-serif, sans-serif;
+  --font-heading: var(--font-outfit), var(--font-geist-sans), ui-sans-serif, sans-serif;
+
+  /* --- RULE 03: every radius step is clamped to the 5px ceiling --- */
+  --radius-xs: 2px;
+  --radius-sm: 3px;
+  --radius-md: 4px;
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+
+  /* --- Elevation --- */
+  --shadow-flat: var(--shadow-flat);
+  --shadow-subtle: var(--shadow-subtle);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-overlay: var(--shadow-overlay);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Typographic scale — Figma "03 — Typography" */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+  }
+
+  h1 {
+    @apply text-5xl font-bold;
+    letter-spacing: -0.01em; /* Display H1 · Outfit Bold · 48px · -1% */
+  }
+
+  h2 {
+    @apply text-[28px] font-semibold;
+    letter-spacing: -0.005em; /* Section H2 · Outfit SemiBold · 28px · -0.5% */
+  }
+
+  h3 {
+    @apply text-xl font-semibold;
+  }
+
+  /* System mono — technical UI metas & labels (Geist Mono · 13px · 1px tracking) */
+  .text-system {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.8125rem;
+    letter-spacing: 0.077em;
+    text-transform: uppercase;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   MOTION — keyframes used by src/components/motion-ui/*
+   Only transform and opacity animate, so these stay on the
+   compositor. Every consumer also honours prefers-reduced-motion.
+   ============================================================ */
+
+@keyframes husky-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Anchored sections clear the sticky header when jumped to. */
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+}
+
+/* ============================================================
+   TYPOGRAPHIC SCALE — one vocabulary for the whole site
+   ------------------------------------------------------------
+   Every section draws from these classes and nothing else. This
+   is what keeps the page from becoming a mix of ad-hoc sizes.
+   Sophistication here is restraint: few steps, big jumps
+   between them, and generous space around each.
+   ============================================================ */
+
+@layer components {
+  /* Eyebrow — the mono label that opens every section. */
+  .eyebrow {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    /* Orange on a light surface measures 2.96:1 — husky-600 is the documented
+       accessible substitute (4.74:1). The dark theme keeps the true brand orange,
+       which measures 5.76:1 on the card surface. */
+    color: var(--husky-600);
+    font-weight: 500;
+  }
+
+  .dark .eyebrow {
+    color: var(--primary);
+  }
+
+  /* Display 1 — the page h1. Used exactly once, in the hero. */
+  .display-1 {
+    font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+    font-size: clamp(2.75rem, 7.5vw, 6.5rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    /* 600, not 700: at full bold the Outfit display reads heavy and a little
+       blunt. One notch back keeps the scale and the confidence, and reads
+       composed rather than shouted. */
+    font-weight: 600;
+  }
+
+  /* Display 2 — every section h2. */
+  .display-2 {
+    font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+    font-size: clamp(2rem, 4.5vw, 3.75rem);
+    line-height: 1.02;
+    letter-spacing: -0.025em;
+    font-weight: 500;
+  }
+
+  /* Display 3 — sub-headings inside a section (service names, panel titles). */
+  .display-3 {
+    font-family: var(--font-outfit), ui-sans-serif, sans-serif;
+    font-size: 1.1875rem;
+    line-height: 1.3;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+  }
+
+  /* Lead — the one paragraph that follows a section heading. */
+  .lead {
+    font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
+    line-height: 1.6;
+    color: var(--muted-foreground);
+    max-width: 46ch;
+  }
+
+  /* Body — everything else. Capped measure so lines stay readable. */
+  .body-text {
+    font-size: 0.9375rem;
+    line-height: 1.75;
+    color: var(--muted-foreground);
+    max-width: 68ch;
+  }
+
+  /* Meta — mono captions, table labels, figures' descriptors. */
+  .meta {
+    font-family: var(--font-geist-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    /* Full muted-foreground, not a mix: at 11px this text is small, and the
+       previous 75% blend composited to 4.36:1 — below the AA floor. */
+    color: var(--muted-foreground);
+  }
+
+  /* Section rhythm — one padding vocabulary, so the page has a pulse. */
+  .section-y {
+    padding-block: clamp(5rem, 11vw, 11rem);
+  }
+  .section-y-lg {
+    padding-block: clamp(7rem, 15vw, 15rem);
+  }
+  .section-x {
+    padding-inline: clamp(1.5rem, 5vw, 4rem);
+  }
+}
+
+/* ============================================================
+   SCROLL REVEAL — progressive enhancement, not a dependency
+   ------------------------------------------------------------
+   The hidden state is gated on `html.js`, which a blocking inline
+   script in the root layout sets before first paint. So:
+     · no JS  → everything renders visible. Nothing is lost.
+     · JS     → hidden before paint, revealed on scroll. No flash.
+   Content is never withheld pending hydration.
+   ============================================================ */
+
+.js [data-reveal] {
+  opacity: 0;
+  transition:
+    opacity var(--reveal-duration, 0.6s) cubic-bezier(0.22, 1, 0.36, 1)
+      var(--reveal-delay, 0s),
+    translate var(--reveal-duration, 0.6s) cubic-bezier(0.22, 1, 0.36, 1)
+      var(--reveal-delay, 0s);
+}
+
+.js [data-reveal="up"] {
+  translate: 0 24px;
+}
+.js [data-reveal="down"] {
+  translate: 0 -24px;
+}
+.js [data-reveal="left"] {
+  translate: 24px 0;
+}
+.js [data-reveal="right"] {
+  translate: -24px 0;
+}
+.js [data-reveal="none"] {
+  translate: none;
+}
+
+.js [data-reveal][data-revealed] {
+  opacity: 1;
+  translate: none;
+}
+
+/* Per-unit text reveal */
+.js [data-split] [data-split-unit] {
+  display: inline-block;
+  translate: 0 110%;
+  opacity: 0;
+  transition:
+    translate 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--split-delay, 0s),
+    opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--split-delay, 0s);
+}
+
+.js [data-split][data-revealed] [data-split-unit] {
+  translate: none;
+  opacity: 1;
+}
+
+/* Reduced motion: show everything, immediately, with no travel. */
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal],
+  .js [data-split] [data-split-unit] {
+    opacity: 1 !important;
+    translate: none !important;
+    transition: none !important;
+  }
+}
+
