@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useScroll, useSpring } from "motion/react";
+import { motion, useScroll } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -8,20 +8,17 @@ import { cn } from "@/lib/utils";
  * A hairline bar pinned to the top of the viewport that tracks how far the page has
  * been read.
  *
- * Spring-damped so it trails the scroll slightly instead of snapping — the lag is
- * what makes it feel like a physical indicator. Decorative and hidden from
- * assistive technology; the same information is already in the scrollbar.
+ * Bound straight to `scrollYProgress`, no spring. A spring keeps moving after the
+ * scroll has stopped, and a motion value is outside the reach of `MotionConfig`
+ * and the CSS pins, so it was the one thing still animating under reduced motion.
+ * Progress is linear anyway. Decorative and hidden from assistive technology; the
+ * same information is already in the scrollbar.
  */
 export function ScrollProgress({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const { scrollYProgress } = useScroll();
-  const scaleX = useSpring(scrollYProgress, {
-    stiffness: 120,
-    damping: 30,
-    restDelta: 0.001,
-  });
+  const { scrollYProgress: scaleX } = useScroll();
 
   return (
     <div

@@ -5,7 +5,7 @@ uiverse.io, motion.dev docs, gsap.com/scroll, originkit.dev, skiper-ui.com, cult
 (`nolly-studio/cult-ui` registry), ui.unlumen.com.
 
 **Filter applied throughout:** Husky is a dark, restrained, luxury smart-home brand.
-`#090A0F` background, `#11131C` surface, one accent `#EC663D`, **5px max radius**, flat
+`#090A0F` background, `#11131C` surface, one accent `#EC663D`, **4px max radius**, flat
 surfaces separated by 1px borders at ~8% white, Outfit + Geist. Every recommendation below is
 graded **STEAL** / **ADAPT** / **SKIP** against that.
 
@@ -60,8 +60,9 @@ Critical detail from their source: they **wait for `document.fonts.ready`** befo
 With Outfit/Geist loaded via `next/font`, split before the font swaps and every character
 is measured at the fallback metrics. Non-negotiable.
 
-Accessibility: keep the un-split string in the DOM for screen readers (`aria-label` on the
-wrapper, `aria-hidden` on the spans).
+Accessibility: keep the un-split string in the DOM for screen readers (an `sr-only` copy
+inside the semantic element, `aria-hidden` on the split spans; `aria-label` on a generic
+span is prohibited by ARIA 1.2 and unevenly exposed).
 
 ### 1b. Line-mask reveal — **STEAL (this is the luxury one)**
 Instead of per-character, split by **line**, wrap each line in `overflow: hidden`, and slide the
@@ -157,6 +158,10 @@ demo-reel, all fight a luxury tone.
   Mac trackpad for the first 5 seconds and wrong forever after. It also breaks
   `scroll-behavior`, anchor links, and browser find. **Skip.** Native scroll is the premium
   choice now.
+
+  **Note (2026-09-02):** overruled in the build. Lenis is the site's single smooth-scroll
+  engine (`SmoothScroll`, `src/components/motion-ui/smooth-scroll.tsx`), mounted once in
+  each route layout since commit 5380b7f and disabled under `prefers-reduced-motion`.
 - **`ScrollExpand` / `ScrollFloat`** — video that expands to fullscreen on scroll. Very heavy,
   very trendy, ages in six months.
 - **Parallax** — a mild 5–10% differential on a background image is fine
@@ -223,7 +228,7 @@ Implement as an inline SVG `feTurbulence` data-URI background, not a canvas/WebG
 
 **Bento grid — ADAPT.** Asymmetric grid of differently-sized cards. Perfectly fine *as layout*.
 What makes bentos look cheap is the treatment inside them (gradient blobs, big rounded corners,
-emoji icons). With 5px radius, 1px 8% borders, `#11131C` fill and real product photography,
+emoji icons). With 4px radius, 1px 8% borders, `#11131C` fill and real product photography,
 a bento is just a good editorial grid. **Steal the layout, not the styling.**
 
 **Magnetic hover — ADAPT, buttons only.** Element translates toward the cursor within a
@@ -231,6 +236,10 @@ padding radius (React Bits `Magnet`: offset = `(cursor - center) / strength`, CS
 0.3s out / 0.5s in). Restrict to the primary CTA and maybe the logo. Magnetic *cards* are a
 tell that you copied a template. Note their implementation attaches a global `mousemove` with
 `setState` per frame — rewrite with `useMotionValue` + `useSpring` to avoid re-renders.
+
+**Note (2026-09-02):** client order 2026-09-01 — no Magnetic on CTAs at all. A control that
+moves while you aim at it costs the reader something; see the comment in
+`src/components/sections/hero.tsx`.
 
 **Glare sweep on hover — ADAPT.** A `-45deg` band of white at low opacity sweeping across on
 hover (pure CSS `background-position` transition, no JS at all in React Bits' version). At
@@ -284,6 +293,9 @@ Reasoning:
 5. **Where GSAP still wins:** true pinning with `scrub` and `snap`, complex multi-step timelines, and the now-free `SplitText` plugin (correct line-splitting across wrapped, kerned, non-Latin text is genuinely hard to do by hand). If we build a pinned "how it works" section or want proper line splitting, add `gsap` + `@gsap/react` for **that one component**, wrapped in `useGSAP` and dynamically imported.
 
 **Do not use Lenis / ScrollSmoother.** Native scroll + `scroll-behavior: smooth` for anchors.
+
+**Note (2026-09-02):** overruled — see §2. Lenis (`SmoothScroll`) is the site's single
+smooth-scroll engine, mounted in the route layouts, off under `prefers-reduced-motion`.
 
 **Do not use `framer-motion`** as the package name in new code — it's the legacy alias.
 
@@ -368,11 +380,11 @@ Build these eight. Nothing else from the research.
 
 2. **`<SplitLines>`** — headline line-mask reveal. Split copy on explicit line breaks (authored,
    not measured), each line in `overflow-hidden` with a `motion.span` from `y: 110%`, 80ms
-   stagger. Wait for `document.fonts.ready` before showing. `aria-label` carries the full string.
+   stagger. Wait for `document.fonts.ready` before showing. An `sr-only` copy carries the full string.
 
 3. **`<SpotlightCard>`** — service/product card. `onMouseMove` writes `--mx/--my` CSS vars (no
    state); `::before` radial `rgba(236,102,61,.10)` at 560px + border transitions
-   `rgba(255,255,255,.08) → .16`. 5px radius, `#11131C` fill, `inset 0 1px 0 rgba(255,255,255,.04)`.
+   `rgba(255,255,255,.08) → .16`. 4px radius, `#11131C` fill, `inset 0 1px 0 rgba(255,255,255,.04)`.
 
 4. **`<SpotlightGrid>`** — bento/capabilities grid where the pointer listener lives on the
    *container* and all cells share one light source, so the highlight sweeps continuously

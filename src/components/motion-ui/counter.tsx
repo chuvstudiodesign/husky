@@ -25,10 +25,10 @@ export interface CounterProps extends Omit<React.ComponentProps<"span">, "childr
  * state — a 60fps counter driving 90+ renders would be pure waste, and it keeps the
  * component out of React's update path entirely.
  *
- * Eases out, so it decelerates into the final number instead of stopping dead. The
- * element carries the finished value as its accessible label, so assistive
- * technology reads the result and never a moving number. Under reduced motion the
- * value is simply there.
+ * Eases out, so it decelerates into the final number instead of stopping dead. A
+ * visually hidden span holds the finished value and the animated span is
+ * `aria-hidden`, so assistive technology reads the result and never a moving
+ * number. Under reduced motion the value is simply there.
  */
 export function Counter({
   value,
@@ -85,12 +85,8 @@ export function Counter({
   const label = `${prefix}${value.toFixed(decimals)}${suffix}`;
 
   return (
-    <span
-      ref={ref}
-      className={cn("tabular-nums", className)}
-      aria-label={label}
-      {...props}
-    >
+    <span ref={ref} className={cn("tabular-nums", className)} {...props}>
+      <span className="sr-only">{label}</span>
       {/* Server-rendered with the final value, so the number is correct before
           hydration and correct with JS disabled. */}
       <span ref={numberRef} aria-hidden>

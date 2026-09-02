@@ -37,13 +37,13 @@ export default function FoldTextPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Fold vs Split">
-        <p className="body-text text-sm">
+        <p className="body-text">
           <strong className="text-foreground">Split Text</strong> slides words up
           from behind a mask. <strong className="text-foreground">Fold Text</strong>{" "}
           rotates them around their bottom edge in 3D — the word starts lying flat,
           away from the reader, and swings upright.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           The perspective lives on the wrapper rather than on each word, so the line
           shares one vanishing point and folds as a single sheet instead of as loose
           tiles. That detail is the difference between the effect looking designed

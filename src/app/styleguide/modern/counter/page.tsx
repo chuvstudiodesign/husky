@@ -49,13 +49,13 @@ export default function CounterPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Implementation">
-        <p className="body-text text-sm">
+        <p className="body-text">
           The running number is written straight to{" "}
           <code className="font-mono text-[12px]">textContent</code> rather than
           held in React state. A 60fps counter driving 90-plus renders would be
           pure waste; this keeps it out of React&apos;s update path entirely.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           It also only winds back to zero for a counter the viewer has not
           reached. One already on screen at mount keeps its server-rendered
           value — resetting it would replace a correct number with a wrong one,

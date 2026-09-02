@@ -19,7 +19,7 @@ export default function SpotlightCardPage() {
             {[0.06, 0.1, 0.18].map((n) => (
               <SpotlightCard key={n} intensity={n} className="bg-background p-8">
                 <p className="display-3">Living Room Zone</p>
-                <p className="body-text mt-3 text-sm">
+                <p className="body-text mt-3">
                   Four in-ceiling speakers driven by channels 1–4.
                 </p>
                 <p className="meta mt-6">intensity {n}</p>
@@ -57,7 +57,7 @@ export default function SpotlightCardPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Implementation">
-        <p className="body-text text-sm">
+        <p className="body-text">
           The pointer position is written straight to CSS custom properties on
           the node, so moving the mouse never triggers a React render — the whole
           effect runs in the compositor. Opacity is driven by{" "}

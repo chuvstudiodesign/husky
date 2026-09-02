@@ -13,24 +13,24 @@ export default function SectionIndexPage() {
       />
 
       <ShowcaseSection title="How the active row is chosen">
-        <p className="body-text text-sm">
+        <p className="body-text">
           By which section covers a probe line a third of the way down the
           viewport — not by whichever is &ldquo;most visible&rdquo;.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           That difference matters on a page with sections of wildly different
           heights. Scored by visible area, a short section between two tall ones
           would never win, and the index would skip it entirely. A probe line has
           no such bias: whatever is under it is what you are reading.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           See it working in the left rail on{" "}
           <code className="font-mono text-[12px]">/site-2</code>.
         </p>
       </ShowcaseSection>
 
       <ShowcaseSection title="The active marker">
-        <p className="body-text text-sm">
+        <p className="body-text">
           The active row takes the accent on its number, brightens its label, and
           grows a short rule to the right. Three signals, none of them colour
           alone — the rule alone would carry it in greyscale.

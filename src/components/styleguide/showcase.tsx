@@ -16,9 +16,7 @@ export function ShowcaseHeader({
   return (
     <header className="mb-20">
       <p className="text-system text-primary mb-3 text-[10px]">Component</p>
-      <h1 className="font-display text-6xl leading-none font-bold tracking-[-0.025em]">
-        {title}
-      </h1>
+      <h1>{title}</h1>
       <p className="text-muted-foreground mt-5 max-w-xl text-[15px] leading-relaxed">
         {description}
       </p>
@@ -38,9 +36,7 @@ export function ShowcaseSection({
 }) {
   return (
     <section>
-      <h2 className="font-display mb-8 text-[26px] leading-none font-semibold tracking-[-0.02em]">
-        {title}
-      </h2>
+      <h2 className="mb-8">{title}</h2>
       {children}
     </section>
   );

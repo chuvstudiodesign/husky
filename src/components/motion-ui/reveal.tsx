@@ -22,12 +22,11 @@ export interface RevealProps extends React.ComponentProps<"div"> {
 /**
  * Scroll-triggered entrance.
  *
- * The hidden starting state lives in CSS behind an `html.js` guard, and that class
- * is set by a blocking inline script in the root layout. The consequence matters:
- * the server sends fully visible markup, so if scripts fail, are blocked, or simply
- * haven't run yet, the content is *there* — never a blank page waiting on
- * hydration. Only once JS is confirmed does anything hide, and it hides before
- * first paint, so there is no flash either way.
+ * The hidden starting state lives in CSS behind `@media (scripting: enabled)`, in
+ * globals.css. The consequence matters: the server sends fully visible markup, so
+ * a browser with scripting off or blocked shows the content — never a blank page.
+ * Where scripting is on, the query matches before first paint, so there is no
+ * flash either way.
  *
  * The transition itself is CSS. IntersectionObserver only flips one attribute, so
  * nothing animates on the main thread.

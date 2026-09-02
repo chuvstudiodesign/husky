@@ -30,14 +30,14 @@ export default function ParallaxPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Getting it right">
-        <p className="body-text text-sm">
+        <p className="body-text">
           Parallax is easy to overdo. The rule that keeps it from looking cheap: the
           further something is meant to feel, the <em>less</em> it should move
           relative to the page. Forty to eighty pixels across a full pass is plenty.
           Anything that visibly races the scroll reads as a gimmick rather than as
           depth.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           Give the child more height than its frame — around 120% — so the drift
           never exposes an edge.
         </p>

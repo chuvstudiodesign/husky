@@ -9,7 +9,12 @@ const badgeVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground [a]:hover:bg-primary/80",
+        // `text-brand-black`, not `text-primary-foreground`. Same rule the
+        // Button primary follows: white on #EC663D is 3.21:1, and a 12px badge
+        // label is nowhere near large text. #090A0F on the same orange is
+        // 6.15:1. Pinned rather than tokenised because the fill is pinned —
+        // `bg-primary` is the same orange in both themes.
+        default: "bg-primary text-brand-black [a]:hover:bg-primary/80",
         secondary:
           "bg-secondary text-secondary-foreground [a]:hover:bg-secondary/80",
         destructive:

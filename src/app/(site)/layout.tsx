@@ -26,10 +26,16 @@ export default function SiteLayout({
   return (
     <MotionProvider>
       <SmoothScroll>
+        <a
+          href="#main"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-background focus:px-4 focus:py-3 focus:text-foreground focus:outline-none focus-visible:ring-3 focus-visible:ring-ring"
+        >
+          Skip to content
+        </a>
         <Grain />
         <ScrollProgress />
         <Header />
-        <main className="flex-1">{children}</main>
+        <main id="main" className="flex-1">{children}</main>
         <Footer />
       </SmoothScroll>
     </MotionProvider>

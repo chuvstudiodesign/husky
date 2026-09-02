@@ -32,12 +32,12 @@ export default function ExpandingListPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Why a list">
-        <p className="body-text text-sm">
+        <p className="body-text">
           A numbered list is scannable at a glance, admits a long description
           without the layout fighting it, and reads as a specification rather than
           as marketing. For an integrator, that register is the point.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           The panel is height-animated with a{" "}
           <code className="font-mono text-[12px]">grid-template-rows: 0fr → 1fr</code>{" "}
           transition rather than a guessed max-height, so it is exact whatever the

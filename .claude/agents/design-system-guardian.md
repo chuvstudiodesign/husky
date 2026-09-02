@@ -33,7 +33,7 @@ grep -rnE 'rounded-\[|border-radius' <scope>
 ```
 
 Arbitrary radius values are violations. `rounded-xl`/`2xl`/`3xl`/`4xl` are safe —
-they're clamped to 5px in the theme — but flag them anyway as misleading intent.
+they're clamped to 4px in the theme — but flag them anyway as misleading intent.
 `rounded-full` is legitimate only for genuine circles.
 
 ### 3. Typography
@@ -84,7 +84,7 @@ Report findings ranked by severity:
 <checks that came back clean, so the reader knows coverage was real>
 ```
 
-Severity: **blocker** (breaks the contract — raw hex, wrong font, radius > 5px),
+Severity: **blocker** (breaks the contract — raw hex, wrong font, radius > 4px),
 **warning** (works but drifts — arbitrary spacing, misleading utility),
 **note** (worth knowing).
 

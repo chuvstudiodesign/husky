@@ -50,8 +50,10 @@ it never reaches the product. No Portuguese string ships.
 
 1. **Every visual decision resolves to a design token.** No ad-hoc hex values, no
    one-off spacing. The system in `src/app/globals.css` is the contract.
-2. **5px radius ceiling.** A hard brand rule from the Figma spec (Section System,
-   Rule 03). Every radius step is already clamped in the theme.
+2. **4px radius ceiling.** A hard brand rule from the Figma spec (Section System,
+   Rule 03), tightened from 5px to 4px by the client's 4/8px grid mandate — 5 is not
+   on a 4-grid. The deviation from Figma v2.4 is deliberate. Every radius step is
+   already clamped in the theme.
 3. **Dark-first.** `#090A0F` is the spec'd system backdrop; the app ships with `dark`
    applied. Light mode exists and must stay correct.
 4. **Outfit + Geist Sans + Geist Mono.** No other typefaces.
@@ -69,7 +71,7 @@ Documented and browsable at `/styleguide`.
 | Background | `#090A0F` |
 | Card surface | `#11131C` |
 | Border | `rgb(255 255 255 / 0.08)` |
-| Radius | 5px ceiling |
+| Radius | 4px ceiling |
 | Display / Heading | Outfit |
 | Body | Geist Sans |
 | System / labels | Geist Mono |

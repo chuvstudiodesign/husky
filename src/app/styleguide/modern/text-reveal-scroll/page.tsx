@@ -29,7 +29,7 @@ export default function TextRevealScrollPage() {
             {[0.05, 0.15, 0.35].map((f) => (
               <div key={f}>
                 <p className="meta mb-4">from {f}</p>
-                <TextRevealScroll from={f} className="body-text max-w-[46ch] text-base">
+                <TextRevealScroll from={f} className="body-text max-w-[46ch]">
                   Every smart home is only as reliable as the network under it.
                 </TextRevealScroll>
               </div>
@@ -39,7 +39,7 @@ export default function TextRevealScrollPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Use it once">
-        <p className="body-text text-sm">
+        <p className="body-text">
           The coupling to scroll position is the whole effect: it makes the reader
           feel like they are lighting the sentence as they read it, and it paces a
           long statement without breaking it into slides. Used on more than one

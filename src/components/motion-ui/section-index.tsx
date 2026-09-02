@@ -93,7 +93,7 @@ export function SectionIndex({ items, className, ...props }: SectionIndexProps) 
                 </span>
                 <span
                   className={cn(
-                    "text-[13px] transition-colors duration-300",
+                    "nav-text transition-colors duration-300",
                     isActive
                       ? "text-foreground"
                       : "text-muted-foreground/50 group-hover:text-muted-foreground",
@@ -101,13 +101,15 @@ export function SectionIndex({ items, className, ...props }: SectionIndexProps) 
                 >
                   {item.label}
                 </span>
-                {/* The rule grows to mark the active row — a position indicator
-                    that costs no colour and no extra element. */}
+                {/* The rule grows from the right to mark the active row — a
+                    position indicator that costs no extra element. Fixed width,
+                    scaled: the box is the same in both states, so the row never
+                    reflows and only the compositor works. */}
                 <span
                   aria-hidden
                   className={cn(
-                    "bg-primary ml-auto h-px transition-all duration-500",
-                    isActive ? "w-8 opacity-100" : "w-0 opacity-0",
+                    "bg-primary ml-auto h-px w-8 origin-right transition-[scale,opacity] duration-300",
+                    isActive ? "scale-x-100 opacity-100" : "scale-x-0 opacity-0",
                   )}
                 />
               </a>

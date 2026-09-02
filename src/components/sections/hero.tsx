@@ -1,7 +1,4 @@
-import { ArrowDown } from "lucide-react";
-
 import { Button } from "@/components/ui/button";
-import { Magnetic } from "@/components/motion-ui/magnetic";
 import { Reveal } from "@/components/motion-ui/reveal";
 import { SplitText } from "@/components/motion-ui/split-text";
 
@@ -18,47 +15,129 @@ export function Hero() {
   return (
     <section
       id="start"
-      className="bg-background relative flex min-h-[92svh] items-center overflow-hidden"
-    >
-      {/* One soft pool of brand light behind the headline, so the corner has depth
-          without a gradient wash across the whole section. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -top-1/4 -left-1/4 size-[70vw] rounded-full opacity-[0.07]"
-        style={{
-          background:
-            "radial-gradient(circle, var(--primary) 0%, transparent 65%)",
-        }}
-      />
+      /* No viewport-height floor at all. It went 92svh → 76svh → gone, and the
+         reason it had to go is that a `svh` floor makes the hero's dead space a
+         function of the reader's monitor: at 900px tall, 76svh was under the
+         content and harmless, but at 1600px it padded the section to 1216 and
+         left 400px of empty backdrop between the CTA row and the stats — the
+         void the client kept seeing, on a taller screen than the one it was
+         tuned on.
 
-      {/* z-30 keeps the headline above the fixed half-mark at z-20. */}
-      <div className="section-x relative z-30 mx-auto w-full max-w-[1600px] pt-32 pb-24">
+         Height is now content plus padding, 716px, the same on every viewport.
+         `flex items-center` went with it, because there is no longer any spare
+         height to centre in, and `overflow-hidden` went too: the only thing it
+         ever clipped was the orange pool. */
+      className="bg-background relative"
+    >
+      {/* The orange pool that used to sit in this corner is gone. It was the
+          seam between the hero and the stats band: `radial-gradient(circle, …)`
+          defaults to `farthest-corner`, so on a 1008px square box the ray is
+          713px, not the 504 the author was sizing against, and the tint was
+          still live 72px past the section's bottom edge where `overflow-hidden`
+          cut it off in a straight line across the full width.
+
+          It was not worth fixing, because there was nothing to save. Measured
+          at 1440x900: the pool's brightest pixel came to rgb(15,13,17) against
+          a page of rgb(10,11,16) — five units of red at its peak, under 2% of
+          the channel. Deleting the layer removes the seam at every viewport
+          instead of at the ones we happened to test, and nothing visible goes
+          with it. Client mandate, 2026-09-01.
+
+          The half-mark sits at -z-10 behind all content; this z-30 is redundant but harmless.
+
+          128 top, 128 bottom from `md`. The top figure is a floor, not a
+          preference: the header is fixed at 80px and overlays the page, so
+          anything under ~112 puts the eyebrow behind it. The bottom one is the
+          page's rhythm, not the hero's: paired with the stats strip's own 48px
+          it makes exactly 176px between the CTA row and the first numeral — one
+          `.section-y` beat at 1440, the same step every other boundary on the
+          page uses. The hero's internal air (32/40/48 between eyebrow,
+          headline, lead and buttons) stays as tightened.
+
+          80 at the bottom below `md`, and that is the phone getting its own
+          beat rather than the desktop's. 176px of gap costs a fifth of a 844px
+          screen, and what it bought there was a band of empty backdrop under
+          the CTA row with the photograph reduced to a sliver at the very bottom
+          of the first viewport — 154px of it, 18% of the screen. Client,
+          2026-09-01: the picture has to hold at least a fifth of the phone
+          viewport the moment the hero appears. 80 + the strip's own 48 leaves
+          128px between the buttons and the picture, still above the 80px floor
+          `.section-y` itself clamps to at this width, and puts 202px of
+          photograph on screen at 390×844 (24%) and the whole 255px of it at
+          430×932 (27%).
+          Nothing about the type or the desktop composition moves. */}
+      {/* Below md the whole hero sits on one centred axis — eyebrow, headline,
+          lead, CTA pair. Client reference, 2026-09-01 (Dovetail's phone hero).
+          The desktop composition is untouched: `md:text-left` hands the block
+          back to the left rail at 768, and every centring utility below is
+          paired with an `md:` reset. */}
+      <div className="section-x relative z-30 mx-auto w-full max-w-7xl pt-32 pb-20 text-center md:pb-32 md:text-left">
         <Reveal direction="none" duration={0.8}>
           <p className="eyebrow">Luxury Smart Home Automation</p>
         </Reveal>
 
-        <h1 className="display-1 mt-8 max-w-[16ch] text-balance">
+        {/* Two lines at every width. The accent phrase is held together with
+            `whitespace-nowrap` so it can never split, which makes its rendered
+            width — not the balancer — the thing that sets the phone size: the
+            19-character phrase measures 7.92× the font size in Outfit, so it
+            fits the column exactly when F = (100vw − 48) / 7.92, or 12.63vw
+            − 6.06px. `12vw − 6px` sits just under that line and leaves 17–20px
+            of slack at 360/390/414 — enough that a hinting difference cannot
+            push it into a third line, close enough that the headline still
+            reaches the gutter the way the reference does.
+
+            This replaces the old `max-[420px]:text-4xl` step. A flat 36px was
+            sized for the narrowest phone and then held all the way to 420,
+            which left a 414 screen with a headline 20% narrower than its own
+            column — the step-down was solving 360's problem on every phone.
+
+            The 3.5rem ceiling is where the ramp meets `.display-1`'s own clamp:
+            56px at 517px of viewport, and 57.6px when 7.5vw takes over at md.
+            Leading is the class's own rule, size + 4px, so both `min()`s cross
+            at the same width and the offset stays exact across the ramp. */}
+        <h1 className="display-1 mx-auto mt-8 max-w-[16ch] text-balance max-md:text-[min(12vw_-_6px,3.5rem)] max-md:leading-[min(12vw_-_2px,3.75rem)] md:mx-0">
           <SplitText by="word" stagger={0.045} delay={0.05}>
             Smart homes,
           </SplitText>{" "}
+          {/* No `text-primary` on the second line. A 104px sheet of #EC663D
+              across half the headline is not a signal, it is the page's
+              largest surface of the accent, and it left the eye nothing to
+              follow to the button. The headline is neutral now; scale and
+              weight carry the emphasis, which is what they are for.
+              `whitespace-nowrap` stays — it is a wrapping constraint, and the
+              reason the phrase can never split. */}
           <SplitText
             by="word"
             stagger={0.07}
             delay={0.22}
-            className="text-primary"
+            className="whitespace-nowrap"
           >
             engineered quietly.
           </SplitText>
         </h1>
 
         <Reveal delay={0.3} className="mt-10">
-          {/* Phones: half width, so the fixed half-mark at the right edge never
-              runs under the copy. From sm up the mark is clear of the text and the
-              measure opens to 62ch — wider than the class default, because at 52ch
-              "all" fell alone onto the last line. */}
-          <p className="lead max-w-[50%] sm:max-w-[62ch]">
+          {/* Two measures, one rule: keep the rendered line inside the 45–75
+              character band. `ch` is the advance of "0", wider than the average
+              lowercase letter, so it runs about 1.48 rendered characters to the
+              ch — 42ch is ~62 characters on the desktop, 30ch is ~43 on the
+              phone.
+
+              30 sits a couple of characters under the band's 45 floor, and it
+              is the right trade here: that floor is a long-form reading rule
+              and this is a three-sentence lead on a phone. What the tighter cap
+              buys is the composition. 30ch renders 318px, within 2px of the
+              headline's own line at 390, so the two centred blocks share an
+              edge instead of the lead running wider than the line it supports.
+              At 360 the column is narrower than the cap and wraps first — the
+              cap is a ceiling, not a fixed width. */}
+          {/* `hero-lead` pins font-size/line-height to `.lead`'s pre-2026-09-01
+              formula — see the comment above `.hero-lead` in globals.css. This
+              is the one lead paragraph the client ordered untouched when the
+              rest of `.lead` dropped its ceiling from 24px to 20px. */}
+          <p className="lead hero-lead mx-auto max-w-[30ch] md:mx-0 md:max-w-[42ch]">
             We design and install the systems that make a high-end home
-            effortless, automation, cinema, lighting, sound, security, and the
+            effortless: automation, cinema, lighting, sound, security, and the
             network underneath it all.
           </p>
         </Reveal>
@@ -68,29 +147,23 @@ export function Hero() {
             staggered fade there reads as lag rather than choreography. It is
             rendered in its final state below md; desktop keeps the reveal. */}
         <Reveal delay={0.42} className="mt-12" data-reveal-mobile="off">
-          <div className="flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center">
-            <Magnetic strength={0.2}>
-              <Button asChild size="lg" className="h-12 px-7 text-[15px]">
-                <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">
-                  Request a Consultation
-                </a>
-              </Button>
-            </Magnetic>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="h-12 px-7 text-[15px]"
-            >
-              <a href="#services">See What We Do</a>
+          {/* One ask in the fold. The second button ("What We Do", an anchor
+              to the next section) went on the landing-page structure review,
+              2026-09-02: it only scrolled one screen the reader reaches anyway,
+              and it cost the fold its single action. Below md the one button
+              fills the column (`w-full` releases the fixed 176px box, the 48px
+              height stays); from md it is the 176px CTA it always was. */}
+          <div className="md:flex md:items-center">
+            {/* No `Magnetic` wrapper. The CTA does not drift toward the cursor:
+                a control that moves while you aim at it is the one place on a
+                page where motion costs the reader something. Hover feedback
+                stays, as a colour shift. Client mandate, 2026-09-01. */}
+            <Button asChild size="lg" className="max-md:w-full">
+              <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">
+                Talk to Us
+                <span className="sr-only"> (WhatsApp, opens in a new tab)</span>
+              </a>
             </Button>
-          </div>
-        </Reveal>
-
-        <Reveal delay={0.54} className="mt-24">
-          <div className="flex items-center gap-4">
-            <ArrowDown className="text-primary size-4" />
-            <span className="meta">Boca Raton · Serving South Florida</span>
           </div>
         </Reveal>
       </div>

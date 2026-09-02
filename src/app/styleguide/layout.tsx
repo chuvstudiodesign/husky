@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { navigation } from "./navigation";
+import { HuskyWordmark } from "@/components/motion-ui/husky-wordmark";
 
 export default function StyleguideLayout({
   children,
@@ -25,9 +26,7 @@ export default function StyleguideLayout({
             height={44}
             className="h-11 w-auto shrink-0"
           />
-          <span className="font-display text-2xl leading-none font-bold tracking-tight">
-            HUSKY
-          </span>
+          <HuskyWordmark className="h-5 w-auto" />
         </Link>
 
         <nav className="mt-14 flex flex-col gap-10">

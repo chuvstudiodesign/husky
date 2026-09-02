@@ -13,13 +13,13 @@ export default function SmoothScrollPage() {
       />
 
       <ShowcaseSection title="Why not the usual approach">
-        <p className="body-text text-sm">
+        <p className="body-text">
           Most smooth-scroll libraries take scrolling over entirely, and break the
           things nobody thinks about until they are gone: anchor links, find-in-page,
           keyboard paging, the scrollbar itself. Lenis interpolates the real scroll
           position instead of replacing it, so all of that survives.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           Try it on <code className="font-mono text-[12px]">/site-1</code>, which is
           wrapped in it. The main site is not.
         </p>
@@ -34,7 +34,7 @@ export default function SmoothScrollPage() {
           ].map(([t, d]) => (
             <div key={t} className="bg-card rounded-lg border p-7">
               <p className="meta">{t}</p>
-              <p className="body-text mt-3 text-sm">{d}</p>
+              <p className="body-text mt-3">{d}</p>
             </div>
           ))}
         </div>

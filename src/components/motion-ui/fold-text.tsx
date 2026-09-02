@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
@@ -25,9 +25,10 @@ export interface FoldTextProps {
  * The perspective lives on the wrapper rather than each word, so the whole line
  * shares one vanishing point and folds as a single sheet instead of as loose tiles.
  *
- * Like every reveal here, the starting state is gated behind `html.js`: the server
- * sends a readable headline, and only once scripting is confirmed does anything
- * hide. The full string stays as the accessible label.
+ * Like every reveal here, the starting state is gated behind
+ * `@media (scripting: enabled)`: the server sends a readable headline, and only a
+ * browser with scripting hides anything. The full string sits in a visually hidden
+ * span, so the heading keeps its name.
  */
 export function FoldText({
   children,
@@ -65,20 +66,24 @@ export function FoldText({
       ref={ref as React.Ref<never>}
       data-fold
       className={cn("inline", className)}
-      aria-label={children}
       style={{ perspective: "800px" }}
     >
+      <span className="sr-only">{children}</span>
       {words.map((word, i) => (
-        <span key={`${word}-${i}`} aria-hidden className="inline-block">
+        // The space is a sibling of the word, not a child: inside an
+        // `inline-block` it is trailing whitespace and gets trimmed away, which
+        // runs the whole headline together.
+        <Fragment key={`${word}-${i}`}>
           <span
             data-fold-unit
+            aria-hidden
             className="inline-block origin-bottom"
             style={{ "--fold-delay": `${delay + i * stagger}s` } as React.CSSProperties}
           >
             {word}
           </span>
           {i < words.length - 1 ? " " : ""}
-        </span>
+        </Fragment>
       ))}
     </Tag>
   );

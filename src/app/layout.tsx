@@ -28,7 +28,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Husky — Luxury Smart Home Automation",
   description:
-    "Husky Audio Video. Personalized luxury smart home experiences across South Florida.",
+    "Custom smart home automation, home cinema, lighting, surveillance and networking for high-end homes across South Florida. Over 20 years of custom integration experience.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -11,7 +11,20 @@
    ------------------------------------------------------------
    RULE 01  Background  #090A0F   absolute dark foundation
    RULE 02  Card/Frame  #11131C   component surface container fill
-   RULE 03  Radius      5px MAX   strict aesthetic constant
+   RULE 03  Radius      4px MAX   strict aesthetic constant
+   ------------------------------------------------------------
+   GRID     Every magnitude is a multiple of 4 (8 at section
+            scale). Client mandate 2026-09-01: with no photography
+            on the site, type is the image, so every px the eye
+            can measure — size, leading, padding, radius — lands
+            on the grid. Deliberate exemptions, and only these:
+            1px hairline borders; em-based letter-spacing;
+            vw-driven values between their clamp endpoints (the
+            endpoints themselves are on the grid).
+   DEVIATION  Rule 03 was 5px in Figma v2.4. 5 is not on a 4-grid,
+            so the ceiling moved to 4px on the client's grid
+            mandate. Deliberate, and the one place this file
+            departs from the Figma contract.
    ============================================================ */
 
 :root {
@@ -68,6 +81,15 @@
   --card: #f3f6fa;
   --card-foreground: #15243d;
 
+  /* === CARD QUIET — the half step between the page and a card ===
+     For a panel that has to read as a surface without reading as a card: the
+     stats strip, where four filled tiles at full `--card` weight competed with
+     the hero directly above them. Measured as the midpoint of `--background`
+     and `--card` in each theme, so it is a real half step rather than a
+     guess, and it is the only value allowed between those two. Anything that
+     wants more presence than this uses `--card`. */
+  --card-quiet: #f9fafc;
+
   /* === POPOVER / DROPDOWN / TOOLTIP === */
   --popover: #ffffff;
   --popover-foreground: #15243d;
@@ -97,8 +119,8 @@
   --input: #bec4cd;
   --ring: #ec663d;
 
-  /* === BORDER RADIUS — RULE 03: 5px hard ceiling === */
-  --radius: 0.3125rem; /* 5px */
+  /* === BORDER RADIUS — RULE 03: 4px hard ceiling (was 5px; see header) === */
+  --radius: 0.25rem; /* 4px */
 
   /* === CHART COLORS === */
   --chart-1: #ec663d;
@@ -130,6 +152,13 @@
   --shadow-subtle: 0 1px 2px 0 rgb(21 36 61 / 0.06);
   --shadow-raised: 0 2px 8px -2px rgb(21 36 61 / 0.10);
   --shadow-overlay: 0 8px 28px -8px rgb(21 36 61 / 0.18);
+
+  /* === BLUEPRINT TEXTURE — see the .dark block for the working value ===
+     A dot grid on paper is a device for dark surfaces and the site ships
+     dark, so on a white page the value is set a hair off white and the
+     texture all but disappears, which is the right outcome rather than a
+     compromise. Declared here only so no colour exists in one theme. */
+  --blueprint-dot: #f7f9fb;
 }
 
 /* ---------- DARK THEME — the canonical Husky system (Figma default) ---------- */
@@ -141,6 +170,12 @@
   /* === CARD — RULE 02 === */
   --card: #11131c;
   --card-foreground: #ffffff;
+
+  /* === CARD QUIET === see the light block. #0D0F16 sits between #090A0F and
+     #11131C. White on it measures 19.1:1 and `--muted-foreground` 6.8:1, both
+     a shade better than the same text on `--card`, so the quieter surface
+     costs no contrast. */
+  --card-quiet: #0d0f16;
 
   /* === POPOVER / DROPDOWN / TOOLTIP === */
   --popover: #11131c;
@@ -201,6 +236,33 @@
   --shadow-subtle: 0 1px 2px 0 rgb(0 0 0 / 0.40);
   --shadow-raised: 0 2px 8px -2px rgb(0 0 0 / 0.55);
   --shadow-overlay: 0 8px 28px -8px rgb(0 0 0 / 0.70);
+
+  /* === BLUEPRINT TEXTURE — one tint of Rule 01, and nothing else ===
+     Not a new colour: #090A0F lifted a few points, the lift weighted towards
+     blue so the tint leans on the navy already in the palette rather than
+     introducing a hue. Read as white over the background it is 3.3% alpha.
+
+     Higher than the hairline grid this replaced, and for a reason a number
+     alone hides: a 2px dot every 100px is a hundredth of the ink a ruled grid
+     lays down, and the eye integrates a line but not a speck. At the line's
+     alpha the dots were simply not there. This is the value at which they can
+     be found and still cannot be seen — which is the brief.
+
+     Also higher than it looks, because the dot is an SVG circle. A CSS
+     radial-gradient point-samples and hands back four pixels at the full
+     value; a circle of r=1 centred on a pixel corner covers about 78% of each
+     of the same four, and comes out a fifth dimmer. The token carries the
+     compensation: #0F121C renders as #0F1119, which is the value validated by
+     eye and by diff. Change the dot geometry and this number moves with it.
+
+     Nothing but the ground ever sees it. The layer paints at -z-10 inside its
+     host section, which is above that section's own background and below every
+     word, card and border in it, so no text sits on a dot and no contrast
+     ratio on the site moves. The value is still kept at or under Rule 02's
+     #11131C in every channel as a matter of discipline: the texture is a
+     property of the backdrop, and a backdrop tint brighter than the card fill
+     would be arguing with it. */
+  --blueprint-dot: #0f121c;
 }
 
 @theme inline {
@@ -209,6 +271,7 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
+  --color-card-quiet: var(--card-quiet);
   --color-popover: var(--popover);
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
@@ -250,6 +313,15 @@
   --color-info: var(--info);
   --color-info-foreground: var(--info-foreground);
 
+  /* --- Brand raw exposed as utilities (bg-brand-black, text-brand-orange, …).
+         Theme-invariant by contract: these come from the source vectors and are
+         identical in both themes, so they never resolve through .dark. --- */
+  --color-brand-black: var(--brand-black);
+  --color-brand-surface: var(--brand-surface);
+  --color-brand-light: var(--brand-light);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-navy: var(--brand-navy);
+
   /* --- Brand scales exposed as utilities (bg-husky-500, text-navy-900, …) --- */
   --color-husky-50: var(--husky-50);
   --color-husky-100: var(--husky-100);
@@ -290,7 +362,10 @@
   --font-display: var(--font-outfit), var(--font-geist-sans), ui-sans-serif, sans-serif;
   --font-heading: var(--font-outfit), var(--font-geist-sans), ui-sans-serif, sans-serif;
 
-  /* --- RULE 03: every radius step is clamped to the 5px ceiling --- */
+  /* --- RULE 03: every radius step is clamped to the 4px ceiling.
+         xs and sm sit below the ceiling and are the two steps that
+         are not on the 4-grid; they exist only on ≤28px controls,
+         where 4px reads as a pill. Flagged, not chased. --- */
   --radius-xs: 2px;
   --radius-sm: 3px;
   --radius-md: 4px;
@@ -309,7 +384,7 @@
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border outline-ring;
   }
 
   body {
@@ -337,11 +412,50 @@
 
   h2 {
     @apply text-[28px] font-semibold;
+    /* 28 × 8/7 = 32. Without this the h2 inherits the 1.5 body leading
+       and computes to 42; the calc keeps the line box on the grid and
+       still scales if the size is overridden. */
+    line-height: calc(8 / 7);
     letter-spacing: -0.005em; /* Section H2 · Outfit SemiBold · 28px · -0.5% */
   }
 
   h3 {
     @apply text-xl font-semibold;
+  }
+
+  /* Anti-widow, native CSS. Headings balance across lines at any width, so a
+     display line never drops a single orphan word; paragraphs get `pretty`,
+     which only fixes the last line and leaves the rest of the block alone. */
+  h1,
+  h2,
+  h3,
+  .display-1,
+  .display-2,
+  .display-3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Icons — one size and one stroke for the whole system.
+     Client mandate 2026-09-01: 24x24 (on the 8-grid) at a regular 1.5 stroke,
+     not lucide's default 2, which reads bold beside Geist at body weight.
+
+     Declared here rather than at each call site so a newly imported icon is
+     correct by default and nobody has to remember `strokeWidth={1.5}`. CSS
+     `stroke-width` outranks the SVG presentation attribute lucide emits, so
+     this catches icons that were never touched.
+
+     It sits in the base layer on purpose: a `size-*` utility at a call site
+     still wins, which is what keeps the two structural exceptions working —
+     icons inside a Button (16px, via the primitive's own
+     `[&_svg:not([class*='size-'])]:size-4`) and the styleguide's size demos. */
+  svg.lucide {
+    width: 1.5rem;
+    height: 1.5rem;
+    stroke-width: 1.5;
   }
 
   /* System mono — technical UI metas & labels (Geist Mono · 13px · 1px tracking) */
@@ -368,6 +482,26 @@
   }
 }
 
+/* Scroll cue — the arrow drifts a third of its own height and fades out, so the
+   loop reads as one gesture repeated rather than as a bouncing icon. It never
+   returns visibly: the arrow is transparent at both ends of the cycle, which is
+   what keeps a permanent animation from nagging. */
+@keyframes husky-scroll-cue {
+  0% {
+    transform: translateY(-30%);
+    opacity: 0;
+  }
+  25%,
+  55% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(70%);
+    opacity: 0;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -388,6 +522,47 @@
   section[id] {
     scroll-margin-top: 5rem;
   }
+
+}
+
+/* --------------------------------------------------------------------
+   RULE 04.1 — a section does not repaint the page background.
+
+     Rule 01 gives the site one backdrop and `body` already paints it. A
+     section that also declares `bg-background` is therefore painting
+     #090A0F on top of #090A0F: no pixel changes, and the only thing the
+     repaint accomplishes is to become an opaque floor that buries
+     anything the page puts behind it.
+
+     Something is behind it. The half-mark sits at `-z-10`, which is the
+     one stacking value that cannot paint over a word or a card — CSS
+     paints negative-z descendants before in-flow content, so the
+     guarantee holds structurally instead of depending on each section
+     remembering to raise its own wrapper. The client asked for exactly
+     that guarantee after the mark's ink crossed a stat card. Going
+     negative costs the mark its visibility against these fills, and this
+     is where that is paid, once, rather than in six section files.
+
+     Scoped three ways on purpose. `main` leaves the styleguide alone.
+     The class selector leaves the two coloured bands alone — a
+     `bg-brand-light` or `bg-primary` section is a real surface change
+     and still occludes what is behind it, which is what keeps the mark
+     off the light and orange bands. And it is `background-color` only,
+     so a section that layers a `background-image` keeps it.
+
+   Deliberately unlayered. `.bg-background` is a Tailwind utility and
+   lives in the `utilities` layer, which outranks `base` no matter how
+   specific the selector in `base` is — the first version of this rule
+   sat in `@layer base`, lost the cascade silently, and the mark stayed
+   buried while every selector in it looked correct. Unlayered rules beat
+   every layered one, so this is the layer to be in, and it is the reason
+   this block sits outside the `@layer base` above rather than inside it.
+
+   Delete this and the mark disappears rather than misbehaves. That is
+   the safer failure of the two, and it is why it is written down here
+   instead of being fixed by giving the mark a positive z-index again. */
+main section.bg-background {
+  background-color: transparent;
 }
 
 /* ============================================================
@@ -403,8 +578,14 @@
   /* Eyebrow — the mono label that opens every section. */
   .eyebrow {
     font-family: var(--font-geist-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    letter-spacing: 0.16em;
+    /* 12/16, not the old 11/15.4: 11 and 15.4 are both off the 4-grid,
+       and 12 is the smallest mono size that still tracks at 0.14em
+       without the caps closing up. */
+    font-size: 0.75rem;
+    line-height: calc(4 / 3);
+    /* 0.14em is the one mono tracking value in the scale: `.meta` uses the
+       same number, so eyebrow and caption read as the same instrument. */
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     /* Orange on a light surface measures 2.96:1 — husky-600 is the documented
        accessible substitute (4.74:1). The dark theme keeps the true brand orange,
@@ -420,63 +601,136 @@
   /* Display 1 — the page h1. Used exactly once, in the hero. */
   .display-1 {
     font-family: var(--font-outfit), ui-sans-serif, sans-serif;
-    font-size: clamp(2.75rem, 7.5vw, 6.5rem);
-    line-height: 0.95;
+    /* Ceiling 80, down from 104 (client mandate 2026-09-01). Only the two
+       ceilings moved — the 44px floor and the 7.5vw slope are untouched, which
+       is what keeps the two clamps' crossovers coincident and therefore keeps
+       the +4 offset exact at every width. The ceiling is simply reached earlier
+       now: at 1067px of viewport instead of 1387. */
+    font-size: clamp(2.75rem, 7.5vw, 5rem);
+    /* Leading is size + 4px at every width, not a ratio. The font clamp and
+       the leading clamp share the same 7.5vw slope and the same crossovers,
+       so the line box is 48 at the 44px floor and 84 at the 80px ceiling —
+       both on the grid, where the old flat 1.02 gave 44.88 and 106.08 and
+       neither was. The ratio drifts from 1.09 to 1.05 across the range, which
+       is the direction display leading should drift anyway: tighter as the
+       type gets bigger. */
+    line-height: clamp(3rem, calc(7.5vw + 0.25rem), 5.25rem);
     letter-spacing: -0.035em;
-    /* 600, not 700: at full bold the Outfit display reads heavy and a little
-       blunt. One notch back keeps the scale and the confidence, and reads
-       composed rather than shouted. */
-    font-weight: 600;
+    /* 500, not 700 and no longer 600. Outfit at full bold reads heavy and a
+       little blunt at display size; 600 fixed that and still carried more
+       weight than the line needed. 500 is the same weight `.display-2` uses, so
+       the two display steps now differ by size alone — which is what makes the
+       scale read as one voice at two volumes rather than as two typefaces.
+       Client mandate, 2026-09-01. */
+    font-weight: 500;
   }
 
   /* Display 2 — every section h2. */
   .display-2 {
     font-family: var(--font-outfit), ui-sans-serif, sans-serif;
     font-size: clamp(2rem, 4.5vw, 3.75rem);
-    line-height: 1.02;
-    letter-spacing: -0.025em;
+    /* Same construction as `.display-1`: leading = size + 4px, shared slope,
+       shared crossovers. 36 at the 32px floor, 64 at the 60px ceiling. */
+    line-height: clamp(2.25rem, calc(4.5vw + 0.25rem), 4rem);
+    letter-spacing: -0.028em;
     font-weight: 500;
   }
 
   /* Display 3 — sub-headings inside a section (service names, panel titles). */
   .display-3 {
     font-family: var(--font-outfit), ui-sans-serif, sans-serif;
-    font-size: 1.1875rem;
-    line-height: 1.3;
-    letter-spacing: -0.01em;
+    /* 20/24 — the same size + 4px rule, held still because this step
+       doesn't clamp. 19/21.28 was off the grid on both counts. */
+    font-size: 1.25rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
     font-weight: 500;
+  }
+
+  /* Nav — Geist Sans 12px, the chrome register: header links, rail, section index. */
+  .nav-text {
+    font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+    font-size: 0.75rem;
+    line-height: calc(4 / 3); /* 16 */
   }
 
   /* Lead — the one paragraph that follows a section heading. */
   .lead {
-    font-size: clamp(1.0625rem, 1.5vw, 1.25rem);
-    line-height: 1.6;
+    /* Ceiling 20 (client mandate 2026-09-01, measured against a screenshot of
+       the Services lead). A same-dated mandate earlier this cycle had pushed
+       this to a 24px ceiling; measured on the running site that formula never
+       actually renders 20 anywhere — it's 22.4px at 1280 and clamped to 24px
+       at 1440/1920, always past 20, never on it. This reverts the ceiling to
+       1.25rem and keeps the same 1.75vw slope and 1rem floor, so the phone
+       value (16px, unchanged below a 914px viewport) and the shape of the
+       ramp don't move — only the top of the ramp does. The new ceiling
+       crossover falls at 1143px, comfortably inside common desktop widths, so
+       1280/1440/1920 all render flat at 20.
+
+       The hero's lead is the one documented exception to this class (client
+       order, same date: "só não mexa na hero") — see `.hero-lead` below and
+       the override in `hero.tsx`, which freezes this class's *pre-revert*
+       formula so the hero doesn't shift when this ceiling drops. */
+    font-size: clamp(1rem, 1.75vw, 1.25rem);
+    /* Leading = size + 12px, same slope and crossovers as the font clamp:
+       16/28 on a phone, 20/32 on the desktop. The +12 offset happens to make
+       the desktop end land on a clean 1.6 ratio; a single ratio can't hit the
+       grid at both ends (1.5 gives 24 at 16px, too tight for a lead), so the
+       offset is what stays constant, not the ratio. */
+    line-height: clamp(1.75rem, calc(1.75vw + 0.75rem), 2rem);
     color: var(--muted-foreground);
     max-width: 46ch;
   }
 
+  /* Hero lead pin — client exception, 2026-09-01: every `.lead` above moved
+     its desktop ceiling from 24px to 20px; the hero's lead must not move at
+     all ("só não mexa na hero"). This is `.lead`'s formula frozen verbatim at
+     its pre-revert values, applied only to the hero paragraph alongside
+     `.lead` (for color/max-width) so the two properties it overrides —
+     font-size and line-height — stay exactly what they measured before this
+     change: 16/28px at 390 and 768, 24/36px at 1440 and 1920. Source order
+     inside this same layer, after `.lead`, is what lets it win on those two
+     properties without `!important`. */
+  .hero-lead {
+    font-size: clamp(1rem, 1.75vw, 1.5rem);
+    line-height: clamp(1.75rem, calc(1.75vw + 0.75rem), 2.25rem);
+  }
+
   /* Body — everything else. Capped measure so lines stay readable. */
   .body-text {
-    font-size: 0.9375rem;
+    /* 16/28. ch is font-relative, so raising 15 → 16 leaves the measure at
+       the same character count and only the rendered width grows. */
+    font-size: 1rem;
     line-height: 1.75;
     color: var(--muted-foreground);
-    max-width: 68ch;
+    /* 46ch, not 68. `ch` is the advance of "0", which in Geist is wider than
+       the average lowercase letter, so a 68ch cap rendered ~100 characters per
+       line — half again over the top of the 45–75 band. 46ch measures ~68
+       characters, which is the middle of it. Same number as `.lead` above, so
+       the two body registers now share one measure. */
+    max-width: 46ch;
   }
 
   /* Meta — mono captions, table labels, figures' descriptors. */
   .meta {
     font-family: var(--font-geist-mono), ui-monospace, monospace;
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
+    font-size: 0.75rem; /* 12/16, matching `.eyebrow` */
+    line-height: calc(4 / 3);
+    letter-spacing: 0.14em; /* same mono tracking as `.eyebrow` */
     text-transform: uppercase;
-    /* Full muted-foreground, not a mix: at 11px this text is small, and the
-       previous 75% blend composited to 4.36:1 — below the AA floor. */
+    /* Full muted-foreground, not a mix: at this size the text is small, and
+       the previous 75% blend composited to 4.36:1 — below the AA floor. */
     color: var(--muted-foreground);
   }
 
-  /* Section rhythm — one padding vocabulary, so the page has a pulse. */
+  /* Section rhythm — one padding vocabulary, so the page has a pulse.
+     The slopes are eighths and sixteenths of the viewport on purpose: at
+     12.5vw a viewport that is a multiple of 32 lands on the 4-grid, and one
+     that is a multiple of 64 lands on 8, so the common widths (768, 1024,
+     1280) come out clean instead of on 158.4. Past 1408 the clamp holds it
+     at 176. */
   .section-y {
-    padding-block: clamp(5rem, 11vw, 11rem);
+    padding-block: clamp(5rem, 12.5vw, 11rem);
   }
   .section-y-lg {
     padding-block: clamp(7rem, 15vw, 15rem);
@@ -528,9 +782,45 @@
   }
 
   /* --- Per-word text reveal --- */
+  /* The mask is exactly one line box tall, and a line box is not the same thing
+     as the ink inside it. Outfit's content area measures 1.26em (ascent 1.0,
+     descent 0.26), so wherever the leading is under 1.26 the font overflows its
+     own line box and the parts that stick out — the descenders of g, q, y and
+     the comma below, the ascenders and accents above — get sheared flat by the
+     mask even after the word has finished travelling.
+
+     RE-DERIVED for the 4px grid (2026-09-01), because the leading moved off the
+     flat 1.02. Ink measured from canvas TextMetrics on the loaded face, not
+     from the declared metrics: real ink ascent 0.92em, real ink descent 0.22em.
+     Overflow below the box is 0.59em − leading/2; above it is leading/2 − 0.71em
+     when positive. Worst case across the whole scale is `.display-1` at its
+     104px ceiling, leading 108 (1.0385):
+
+         below  0.59 − 0.5192 = 0.0708em = 7.36px
+         above  0.5192 − 0.5 − 0.0208 …  = 0.0308em = 3.20px
+
+     (`.display-2` at 60/64 gives 0.0567em and 0.0167em; `.display-1` at the
+     44/48 floor gives 0.0445em and nothing above.)
+
+     0.15em holds, with 2.1× headroom on the deeper side, so it stays. The equal
+     negative margin puts the margin box back at the original height, and since
+     a line box is sized from the inline-block's margin box, leading and page
+     layout are untouched — the type scale keeps its grid, the mask stops lying
+     about where the glyph ends. */
+  [data-split] [data-split-mask] {
+    padding-block: 0.15em;
+    margin-block: -0.15em;
+  }
+
   [data-split] [data-split-unit] {
     display: inline-block;
-    translate: 0 110%;
+    /* Has to clear the padded mask, not just the line box. The word travels
+       1.25 × its own line box; to hide it the travel has to be at least
+       lineBox + padding − halfLeading − 0.08em·fontSize, which at the hero's
+       104/108 is 126.8px against the 135px it actually travels — 8.2px of
+       margin. Checked at the other end of the scale too: display-2 at 60/64
+       needs 74.0 and travels 80. */
+    translate: 0 125%;
     opacity: 0;
     transition:
       translate 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--split-delay, 0s),
@@ -589,15 +879,33 @@
   [data-split] [data-split-unit],
   [data-image-reveal],
   [data-fold] [data-fold-unit],
-  /* Scroll-linked, so its opacity is an inline style set by Motion. Overriding
-     it here rather than in JS keeps the server and client markup identical —
-     `useReducedMotion()` resolves to null on the server, so branching on it
-     would break hydration for precisely the people who asked for less motion. */
-  [data-text-reveal] > span {
+  /* Scroll-linked, so the travel is an inline style set by Motion — opacity on
+     the text reveal, a transform on the parallax. Overriding it here rather than
+     in JS keeps the server and client markup identical: `useReducedMotion()`
+     resolves to null on the server, so branching on it would break hydration for
+     precisely the people who asked for less motion. Both ride the rule above
+     rather than getting their own; a second reduced-motion rule with a
+     look-alike declaration is what the minifier eats. */
+  [data-text-reveal] > span,
+  [data-parallax] {
     opacity: 1 !important;
-    translate: none !important;
     transform: none !important;
     clip-path: none !important;
     transition: none !important;
+  }
+
+  /* The travel reset gets its own rule, and a deliberately different selector
+     list, for one reason: sitting next to `transform: none !important` the
+     minifier treated `translate` as the same property and dropped it from the
+     compiled chunk. The starting state `translate: 0 110%` then survived, and
+     every masked word stayed parked one line below its mask — a blank headline
+     for exactly the visitors who asked for less motion.
+     A shorter selector list also blocks the merge that would put the two back
+     into one rule. If you touch this, verify in the CSS the server serves, not
+     here: `curl` the chunk and grep for `translate`. */
+  [data-reveal],
+  [data-split] [data-split-unit],
+  [data-fold] [data-fold-unit] {
+    translate: 0 0 !important;
   }
 }

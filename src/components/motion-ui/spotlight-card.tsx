@@ -47,7 +47,7 @@ export function SpotlightCard({
       onMouseMove={handleMove}
       className={cn(
         "group/spotlight relative isolate overflow-hidden rounded-lg border",
-        "transition-colors duration-500 hover:border-white/16",
+        "transition-colors duration-300 hover:border-white/16",
         className,
       )}
       style={
@@ -64,7 +64,7 @@ export function SpotlightCard({
       {/* Surface wash */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-500 group-hover/spotlight:opacity-100"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-0 transition-opacity duration-300 group-hover/spotlight:opacity-100"
         style={{
           background:
             "radial-gradient(var(--spot) circle at var(--mx) var(--my), color-mix(in oklch, var(--primary) calc(var(--spot-alpha) * 100%), transparent), transparent 70%)",
@@ -73,7 +73,7 @@ export function SpotlightCard({
       {/* Border catch — tighter and brighter than the wash */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-500 group-hover/spotlight:opacity-100"
+        className="pointer-events-none absolute inset-0 rounded-lg opacity-0 transition-opacity duration-300 group-hover/spotlight:opacity-100"
         style={{
           padding: 1,
           background:

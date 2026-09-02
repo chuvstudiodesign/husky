@@ -18,8 +18,8 @@ import { Reveal } from "@/components/motion-ui/reveal";
  */
 export function Showcase() {
   return (
-    <section aria-label="Our work" className="bg-background border-t">
-      <div className="section-x section-y mx-auto max-w-[1600px]">
+    <section aria-label="Our work" className="bg-background">
+      <div className="section-x section-y mx-auto max-w-7xl">
         <Reveal>
           <p className="eyebrow">The result</p>
           <h2 className="display-2 mt-7 max-w-[18ch] text-balance">

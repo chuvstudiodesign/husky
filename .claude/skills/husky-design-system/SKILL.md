@@ -54,6 +54,22 @@ Orange is a **signal**, not a surface. It marks the active zone, the primary act
 the one thing that matters in a view. A page with orange everywhere has no hierarchy.
 Roughly: one primary orange element per viewport.
 
+### Bands and text on them — RULE 04 (client, 2026-09-01)
+
+Four rules, and they are not preferences:
+
+1. **One site background: `#090A0F`.** A full-width band may be that background,
+   `--brand-light`, or primary orange. Nothing else runs edge to edge — no navy band,
+   no card-coloured band, no gradient.
+2. **Orange band ⇒ text is `--brand-black`. Always.** Buttons on orange included.
+   White on orange does not ship, whatever the size.
+3. **Light band ⇒ text is black or navy only.** No grey body copy on light, no orange
+   headings on light.
+4. **Zero decorative dividers.** No hairline rule between sections, no `Separator` used
+   as a section break, no gradient hairline. Separation comes from whitespace and a
+   change of surface, nothing else. Component chrome — card outlines, input borders,
+   focus rings — is not a divider and stays.
+
 ### Known contrast ceiling
 
 White on `#EC663D` measures **3.21:1** — AA for large text only. The Figma uses it on
@@ -65,12 +81,39 @@ buttons and it is brand-correct, so it stays. But:
 
 ## Typography
 
-| Role | Family | Spec |
+The shipped scale is a set of classes in `globals.css`. Every value sits on the 4/8px
+grid (client mandate, 2026-09-01: every px the eye can measure lands on the grid).
+
+Photography exists on the site since 2026-09-01 (client reversal of the earlier
+no-photography rule): `public/photos/` holds the brand assets, and the showcase SVGs
+embed CC BY photos (credits in `docs/asset-credits.md`). The **24px photographic
+radius exception** to the 4px ceiling survives in exactly one place — the Approach
+portrait (`src/components/sections/approach.tsx`); the stats map image went back to
+4px on a later client order the same day. System chrome stays at 4px everywhere.
+
+| Class | Family | Size / leading |
 |---|---|---|
-| Display H1 | Outfit Bold | 48px, tracking −1% |
-| Section H2 | Outfit SemiBold | 28px, tracking −0.5% |
-| Body | Geist Sans Regular | 14–16px, line-height 1.5 |
-| System / label | Geist Mono | 11–13px, tracking 1px, uppercase |
+| `.display-1` | Outfit 600 | clamp 44 → 104px, leading = size + 4px, tracking −3.5% |
+| `.display-2` | Outfit 500 | clamp 32 → 60px, leading = size + 4px, tracking −2.8% |
+| `.display-3` | Outfit 500 | 20 / 24 |
+| `.lead` | Geist Sans | 16/28 on a phone → 20/32 on the desktop |
+| `.hero-lead` | Geist Sans | Hero-only pin, added alongside `.lead`: 16/28 → 24/36 |
+| `.body-text` | Geist Sans | 16 / 28 |
+| `.nav-text` | Geist Sans | 12 / 16 |
+| `.eyebrow` `.meta` | Geist Mono | 12 / 16, tracking 0.14em, uppercase |
+| `.text-system` | Geist Mono | 13px, tracking 0.077em, uppercase |
+
+Draw from these and nothing else — no `text-sm` on a paragraph, no hand-set size. The
+bare `h1`/`h2` elements keep the Figma base spec (48px and 28px in Outfit) for pages
+that use raw headings, such as the styleguide.
+
+`.lead`'s desktop ceiling moved from 24px to 20px on client order 2026-09-01 (a
+screenshot of the Services lead, measured on the running site, showed it never
+actually landing on 20 — 22.4px at 1280, clamped at 24px from ~1371px on). One
+paragraph is the documented exception: the hero's lead ("só não mexa na hero," same
+order). It carries `.hero-lead` alongside `.lead`, in `hero.tsx`, which freezes
+`.lead`'s pre-revert formula so the hero renders exactly what it did before —
+16/28px at 390/768, 24/36px at 1440/1920. No other `.lead` gets this treatment.
 
 Utilities: `font-display` / `font-heading` (Outfit), `font-sans` (Geist),
 `font-mono` (Geist Mono). The `.text-system` class packages the mono label treatment.
@@ -86,17 +129,24 @@ body copy.
 
 ## Radius — RULE 03
 
-**5px maximum. Hard ceiling. No exceptions.**
+**4px maximum. Hard ceiling. No exceptions.**
+
+Figma v2.4 spec'd 5px. The client's 4/8px grid mandate (2026-09-01) outranks it —
+5 is not on a 4-grid — so the ceiling moved to 4. Deliberate, and the one place the
+code departs from the Figma contract. Do not "restore" it.
 
 Every step in the theme is already clamped:
 
 ```
---radius-xs  2px    --radius-lg   5px
---radius-sm  3px    --radius-xl   5px  ← clamped
---radius-md  4px    --radius-2xl  5px  ← clamped
-                    --radius-3xl  5px  ← clamped
-                    --radius-4xl  5px  ← clamped
+--radius-xs  2px    --radius-lg   4px
+--radius-sm  3px    --radius-xl   4px  ← clamped
+--radius-md  4px    --radius-2xl  4px  ← clamped
+                    --radius-3xl  4px  ← clamped
+                    --radius-4xl  4px  ← clamped
 ```
+
+`xs` and `sm` are the two documented exemptions from the grid: they exist only for
+controls ≤28px tall, where 4px reads as a pill. Nothing larger may use them.
 
 `rounded-full` is still available and correct for genuine circles — status dots,
 avatars, the reaction pill. It is not a loophole for pill-shaped buttons.
@@ -149,9 +199,12 @@ breadcrumb · bubble · button · card · label · radio-group · separator · s
 ## Checklist before shipping any UI
 
 1. Zero raw hex values outside documented exceptions.
-2. Every radius ≤ 5px (or a true circle).
+2. Every radius ≤ 4px (or a true circle).
 3. Renders correctly in both themes.
 4. Body text ≥ 4.5:1; large text ≥ 3:1.
-5. Three font families, no more.
+5. Three font families, no more, and every size from the class scale.
 6. No card nested inside a card.
 7. Orange used as signal, not decoration.
+8. Full-width bands are background, brand-light or orange — nothing else.
+9. Text on orange is brand-black; text on light is black or navy.
+10. No decorative divider anywhere: whitespace and surface change only.

@@ -148,7 +148,7 @@ export default function BadgePage() {
           ]}
         />
         <p className="text-muted-foreground mt-5 text-[13px] leading-relaxed">
-          Height is fixed at 20px. Corner radius resolves to the system 5px
+          Height is fixed at 20px. Corner radius resolves to the system 4px
           ceiling rather than a pill, per the brand&apos;s radius rule.
         </p>
       </ShowcaseSection>

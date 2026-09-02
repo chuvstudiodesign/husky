@@ -18,7 +18,7 @@ These hold for every version. Breaking one is a bug, not a variation.
 2. **Every new component goes into the design system.** Anything built for these
    versions gets a page under `/styleguide/modern/*` and an entry in
    `navigation.ts`. Adding pages is expected; editing existing ones is not.
-3. **The design system is the contract.** Tokens only, 5px radius ceiling, Outfit /
+3. **The design system is the contract.** Tokens only, 4px radius ceiling, Outfit /
    Geist / Geist Mono, two surface levels, no card inside a card.
 4. **Content stays the same across versions.** Same copy, same facts, same services.
    What varies is presentation. Nothing gets invented to fill a layout.
@@ -55,7 +55,7 @@ Studied in `docs/modern-patterns.md`. What to take from each:
 | 21st.dev | follow-mouse tech elements, constellation fields |
 | UIverse | small interaction details, loaders |
 
-**Filter everything through the brand:** dark, restrained, one accent, 5px radius,
+**Filter everything through the brand:** dark, restrained, one accent, 4px radius,
 flat surfaces on 1px borders. No glassmorphism, no gradient soup, no pill shapes, no
 rainbow. If a component only reads well with a purple-to-cyan gradient, it is the
 wrong component.

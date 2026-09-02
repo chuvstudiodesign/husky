@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useReducedMotion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,12 @@ export interface ParallaxProps extends React.ComponentProps<"div"> {
  *
  * Scroll-linked rather than triggered, so it tracks position continuously and
  * reverses correctly when scrolling back up. Only `transform` animates.
+ *
+ * Reduced motion is handled in CSS, not here. The drift is an inline transform
+ * written by Motion, and `useReducedMotion()` resolves to null on the server, so
+ * branching on it would render an offset on the server and `none` on the client —
+ * a hydration mismatch for exactly the people who asked for less motion. The
+ * markup stays deterministic and `[data-parallax]` is pinned flat in globals.css.
  */
 export function Parallax({
   distance = -60,
@@ -34,7 +40,6 @@ export function Parallax({
   ...props
 }: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const reduced = useReducedMotion();
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -44,12 +49,15 @@ export function Parallax({
   const shift = useTransform(
     scrollYProgress,
     [0, 1],
-    reduced ? [0, 0] : [-distance / 2, distance / 2],
+    [-distance / 2, distance / 2],
   );
 
   return (
     <div ref={ref} className={cn(className)} {...props}>
-      <motion.div style={axis === "y" ? { y: shift } : { x: shift }}>
+      <motion.div
+        data-parallax=""
+        style={axis === "y" ? { y: shift } : { x: shift }}
+      >
         {children}
       </motion.div>
     </div>

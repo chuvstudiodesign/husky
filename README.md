@@ -14,9 +14,9 @@ Motion
 |---|---|
 | `/` | The main landing page |
 | `/new-construction` | The "bring your integrator in early" argument, aimed at people currently building |
-| `/styleguide` | Design tokens: colour, type, radius, elevation |
+| `/styleguide` | Design tokens: colour, type, radius, elevation, plus inline demos of button, card, badge, alert and radio group |
 | `/styleguide/modern/*` | The eight custom motion components |
-| `/styleguide/components/*` | The shadcn primitives in Husky's tokens |
+| `/styleguide/components/*` | Nine shadcn primitives with a page each: accordion, alert, alert-dialog, aspect-ratio, attachment, avatar, badge, breadcrumb, bubble. The other six — button, card, label, radio-group, separator, spinner — have no page of their own |
 
 ## Running it
 
@@ -37,9 +37,16 @@ on the site resolves to a token defined there, and `/styleguide` documents them.
 Three rules carry over from the Figma spec and are not negotiable:
 
 1. **Background `#090A0F`, card surface `#11131C`.** Two surface levels, never a card
-   nested inside a card.
-2. **5px radius ceiling.** Every step in the theme is clamped, so `rounded-xl` and
-   `rounded-4xl` both resolve to 5px. `rounded-full` is for genuine circles only.
+   nested inside a card. One background for the whole site: a full-width band is that
+   background, `brand-light` or orange, and nothing else. Text on an orange band is
+   `#090A0F`, buttons included; text on a light band is black or navy. Sections are
+   separated by whitespace and a change of surface, never by a decorative rule — card
+   outlines, inputs and focus rings are chrome, not dividers. The full wording is in
+   `.claude/skills/husky-design-system/SKILL.md`.
+2. **4px radius ceiling.** Figma v2.4 spec'd 5px; the client's 4/8px grid mandate moved
+   it to 4, because 5 is not on a 4-grid. That deviation is deliberate. Every step in
+   the theme is clamped, so `rounded-xl` and `rounded-4xl` both resolve to 4px.
+   `rounded-full` is for genuine circles only.
 3. **Three typefaces.** Outfit for display, Geist Sans for body, Geist Mono for
    technical labels.
 
@@ -49,8 +56,16 @@ a light/dark toggle: near-black, card, a single light band, then the orange clos
 ## Typographic scale
 
 Sections draw from one vocabulary rather than inventing sizes:
-`.display-1` `.display-2` `.display-3` `.lead` `.body-text` `.meta` `.eyebrow`,
-plus `.section-x` / `.section-y` for rhythm.
+`.display-1` `.display-2` `.display-3` `.lead` `.body-text` `.nav-text` `.meta`
+`.eyebrow`, plus `.section-x` / `.section-y` for rhythm.
+
+Every size and leading in that vocabulary lands on the 4/8px grid — body 16/28, lead
+16/28 → 20/32, nav and the mono labels 12/16, display leading always the size plus 4.
+The classes carry it; setting a size by hand is how the grid breaks.
+
+One exception: the hero's lead paragraph keeps `.lead`'s pre-2026-09-01-order sizing
+(16/28 → 24/36) via a `.hero-lead` class added alongside `.lead` in `hero.tsx`, per
+client order — every other `.lead` on the site takes the 20/32 desktop figure above.
 
 ## Motion
 

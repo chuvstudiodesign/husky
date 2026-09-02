@@ -84,7 +84,7 @@ export default function Site2Page() {
     <div className="min-h-screen">
       <Rail />
 
-      <main className="lg:pl-80">
+      <main id="main" className="lg:pl-80">
         <div className="mx-auto max-w-[880px] px-6 pt-28 pb-32 md:px-12 lg:pt-0">
           {/* ── 01 Introduction ─────────────────────────────── */}
           <section id="intro" className="flex min-h-[86svh] flex-col justify-center">
@@ -127,7 +127,9 @@ export default function Site2Page() {
               <h2 className="display-2 mt-7 max-w-[16ch] text-balance">
                 Eight systems. One house that behaves.
               </h2>
-              <p className="body-text mt-8 max-w-[58ch] text-base">
+              {/* `.lead`: the paragraph directly under a section heading holds
+                  one register across the whole site. */}
+              <p className="lead mt-8 max-w-[58ch]">
                 Most homes accumulate technology one purchase at a time, and it
                 shows. Select a system to read the specification.
               </p>
@@ -153,13 +155,16 @@ export default function Site2Page() {
               </TextRevealScroll>
             </div>
             <Reveal delay={0.1} className="mt-8">
-              <p className="body-text max-w-[60ch] text-base">
+              <p className="body-text max-w-[60ch]">
                 If you are building or renovating, bring us in while the plan is
                 still on paper.
               </p>
+              {/* Neutral. This is a read-more link, not the page's action, and
+                  orange on it competed with the contact CTA further down. The
+                  arrow and the underline on hover carry the affordance. */}
               <Link
                 href="/new-construction"
-                className="text-primary hover:text-husky-400 mt-8 inline-block text-[15px] transition-colors"
+                className="text-foreground hover:text-muted-foreground mt-8 inline-block text-[15px] underline-offset-4 transition-colors hover:underline"
               >
                 Read how we plan a build →
               </Link>
@@ -178,9 +183,12 @@ export default function Site2Page() {
               <ol className="flex flex-col">
                 {["Cisco", "Araknis", "Ubiquiti", "CommScope", "Sonos"].map(
                   (brand, i) => (
+                    /* No rules. The 24px above and below each row is untouched,
+                       so the list keeps exactly the rhythm it had — 48px
+                       between two brand names — and only the line is gone. */
                     <li
                       key={brand}
-                      className="flex items-baseline gap-8 border-t py-6 last:border-b"
+                      className="flex items-baseline gap-8 py-6"
                     >
                       <span className="text-muted-foreground/40 font-mono text-[11px] tabular-nums">
                         {String(i + 1).padStart(2, "0")}
@@ -192,7 +200,7 @@ export default function Site2Page() {
                   ),
                 )}
               </ol>
-              <p className="body-text mt-8 max-w-[58ch] text-sm">
+              <p className="body-text mt-8 max-w-[58ch]">
                 Husky works with the leading platforms in the industry and is
                 certified to work with their systems.
               </p>
@@ -208,8 +216,8 @@ export default function Site2Page() {
               </h2>
             </Reveal>
             <Reveal delay={0.1} className="mt-10">
-              <div className="body-text max-w-[60ch] space-y-6 text-base">
-                <p>
+              <div className="body-text max-w-[60ch] space-y-6">
+                <p className="lead max-w-none">
                   We specialize in smart home technology, commercial control and
                   automation, Wi-Fi, home cinema and audio/video distribution.
                   For over 20 years we have worked with high-end residential and
@@ -229,9 +237,12 @@ export default function Site2Page() {
             <Reveal delay={0.16} className="mt-14">
               <dl className="flex flex-col">
                 {FACTS.map(([label, value]) => (
+                  /* 24px, up from 20. With the hairline gone the gap is the
+                     only thing grouping these rows, and 20 was the last
+                     off-8-grid magnitude in this list. */
                   <div
                     key={label}
-                    className="flex flex-col gap-1 border-t py-5 last:border-b sm:flex-row sm:items-baseline sm:justify-between sm:gap-10"
+                    className="flex flex-col gap-1 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-10"
                   >
                     <dt className="meta shrink-0">{label}</dt>
                     <dd className="text-[15px] sm:text-right">{value}</dd>
@@ -271,7 +282,7 @@ export default function Site2Page() {
                     true,
                   ],
                 ].map(([label, value, href, external]) => (
-                  <li key={label as string} className="border-t last:border-b">
+                  <li key={label as string}>
                     <a
                       href={href as string}
                       {...(external
@@ -280,7 +291,10 @@ export default function Site2Page() {
                       className="group flex flex-col gap-1 py-6 sm:flex-row sm:items-baseline sm:justify-between sm:gap-10"
                     >
                       <span className="meta shrink-0">{label as string}</span>
-                      <span className="group-hover:text-primary text-[15px] transition-colors sm:text-right">
+                      {/* Underline on hover, not a jump to orange: the same
+                          affordance the home page's contact channels use, and
+                          it does not spend the accent on a hover state. */}
+                      <span className="text-[15px] underline-offset-4 group-hover:underline sm:text-right">
                         {value as string}
                       </span>
                     </a>
@@ -288,7 +302,9 @@ export default function Site2Page() {
                 ))}
               </ul>
             </Reveal>
-            <Reveal delay={0.2} className="mt-20 border-t pt-8">
+            {/* No rule over the colophon: 112px of clear background is already
+                the boundary between the contact list and the legal line. */}
+            <Reveal delay={0.2} className="mt-28">
               <div className="flex flex-col justify-between gap-3 sm:flex-row">
                 <p className="meta">
                   © {new Date().getFullYear()} Husky Automation Corp

@@ -35,13 +35,13 @@ export default function GrainPage() {
       </ShowcaseSection>
 
       <ShowcaseSection title="Usage">
-        <p className="body-text text-sm">
+        <p className="body-text">
           Mounted once, in the site layout — not per section. It is{" "}
           <code className="font-mono text-[12px]">position: fixed</code> and
           spans the viewport, so one instance covers the whole page as it
           scrolls.
         </p>
-        <p className="body-text mt-4 text-sm">
+        <p className="body-text mt-4">
           Generated inline with SVG turbulence, so it costs no network request.
           Keep it under about 4% — if you can see grain, it is too strong.
         </p>

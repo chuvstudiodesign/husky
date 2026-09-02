@@ -29,8 +29,8 @@ const CLIP: Record<string, string> = {
  * photograph it is worth the extra care.
  *
  * `clip-path` animates on the compositor, so this costs nothing per frame. Like the
- * other reveals, the hidden state is gated behind `html.js`, so with scripting
- * unavailable the image is simply visible.
+ * other reveals, the hidden state is gated behind `@media (scripting: enabled)`, so
+ * with scripting unavailable the image is simply visible.
  */
 export function ImageReveal({
   direction = "up",

@@ -15,6 +15,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
+import { HuskyWordmark } from "@/components/motion-ui/husky-wordmark";
 
 /* ------------------------------------------------------------------ */
 
@@ -31,9 +32,7 @@ function Section({
     <section>
       <div className="mb-10">
         <p className="text-system text-primary mb-3 text-[10px]">{eyebrow}</p>
-        <h2 className="font-display text-[32px] leading-none font-semibold tracking-[-0.02em]">
-          {title}
-        </h2>
+        <h2>{title}</h2>
       </div>
       {children}
     </section>
@@ -158,31 +157,57 @@ export default function StyleguidePage() {
     },
   ];
 
+  /* The scale documents itself: every row renders the production class from
+     globals.css, so editing a token moves this page with it. The note is the
+     role, never the numbers — a hand-copied "48 / −1%" is exactly what drifted
+     away from the real values last time. */
   const typeScale = [
     {
-      label: "Display",
-      sample: "INTELLIGENT HOME",
-      meta: "Outfit Bold · 48 / −1%",
-      cls: "font-display text-5xl font-bold tracking-[-0.01em]",
+      cls: "display-1",
+      sample: "Engineered quietly.",
+      note: "The page h1. Used once, in the hero.",
     },
     {
-      label: "Heading",
-      sample: "Audio Video Integration",
-      meta: "Outfit SemiBold · 28 / −0.5%",
-      cls: "font-display text-[28px] font-semibold tracking-[-0.005em]",
+      cls: "display-2",
+      sample: "One house that behaves.",
+      note: "Every section h2.",
     },
     {
-      label: "Body",
+      cls: "display-3",
+      sample: "Multi Room Audio",
+      note: "Sub-headings inside a section: service names, panel titles.",
+    },
+    {
+      cls: "lead",
       sample:
-        "We engineer personalized luxury smart home experiences across South Florida.",
-      meta: "Geist Regular · 14 / 1.5",
-      cls: "font-sans text-sm",
+        "We design and install the systems that make a high-end home effortless, automation, cinema, lighting, sound and the network underneath it all.",
+      note: "The one paragraph after a section heading. Carries its own colour and a 46ch measure.",
     },
     {
-      label: "System",
+      cls: "body-text",
+      sample:
+        "Most homes accumulate technology one purchase at a time, and it shows. We design the whole system first, then install it, so everything answers to the same logic.",
+      note: "Everything else. Owns size and leading — never pair it with text-sm or text-base.",
+    },
+    {
+      cls: "nav-text",
+      sample: "Systems · Approach · Platforms · Contact",
+      note: "The chrome register: header links, the rail, the section index.",
+    },
+    {
+      cls: "text-system",
       sample: "[ZONE_01] LIGHTS: 75% // AUDIO: ACTIVE",
-      meta: "Geist Mono · 13 / 1px",
-      cls: "font-mono text-[13px] tracking-[0.077em]",
+      note: "Mono UI labels and technical annotations.",
+    },
+    {
+      cls: "eyebrow",
+      sample: "02 — Systems",
+      note: "The mono label that opens every section.",
+    },
+    {
+      cls: "meta",
+      sample: "Boca Raton · Florida",
+      note: "Mono captions, table labels, figure descriptors.",
     },
   ];
 
@@ -190,9 +215,9 @@ export default function StyleguidePage() {
     { name: "xs", cls: "rounded-xs", px: "2" },
     { name: "sm", cls: "rounded-sm", px: "3" },
     { name: "md", cls: "rounded-md", px: "4" },
-    { name: "lg", cls: "rounded-lg", px: "5" },
-    { name: "xl", cls: "rounded-xl", px: "5" },
-    { name: "2xl", cls: "rounded-2xl", px: "5" },
+    { name: "lg", cls: "rounded-lg", px: "4" },
+    { name: "xl", cls: "rounded-xl", px: "4" },
+    { name: "2xl", cls: "rounded-2xl", px: "4" },
   ];
 
   const shadows = [
@@ -215,13 +240,9 @@ export default function StyleguidePage() {
             className="h-22 w-auto"
             priority
           />
-          <span className="font-display text-[56px] leading-none font-bold tracking-[-0.02em]">
-            HUSKY
-          </span>
+          <HuskyWordmark className="h-10 w-auto" />
         </div>
-        <h1 className="font-display mt-14 text-6xl leading-none font-bold tracking-[-0.025em]">
-          Design Tokens
-        </h1>
+        <h1 className="mt-14">Design Tokens</h1>
         <p className="text-muted-foreground mt-5 max-w-md text-[15px]">
           The foundation layer for Husky&apos;s luxury smart home interfaces.
         </p>
@@ -317,23 +338,23 @@ export default function StyleguidePage() {
           <div className="flex flex-col">
             {typeScale.map((row, i) => (
               <div
-                key={row.label}
-                className={`grid grid-cols-[100px_1fr] items-baseline gap-8 py-9 ${
+                key={row.cls}
+                className={`grid grid-cols-[140px_1fr] items-baseline gap-8 py-9 ${
                   i > 0 ? "border-t" : ""
                 }`}
               >
-                <span className="text-system text-muted-foreground/70 text-[10px]">
-                  {row.label}
-                </span>
+                <code className="text-primary font-mono text-[11px]">
+                  .{row.cls}
+                </code>
                 <div className="min-w-0">
                   <p className={row.cls}>{row.sample}</p>
-                  <p className="text-muted-foreground/60 mt-3 font-mono text-[11px]">
-                    {row.meta}
+                  <p className="text-muted-foreground/60 mt-3 max-w-[52ch] font-mono text-[11px] leading-relaxed">
+                    {row.note}
                   </p>
                 </div>
               </div>
             ))}
-            <div className="grid grid-cols-[100px_1fr] items-baseline gap-8 border-t py-9">
+            <div className="grid grid-cols-[140px_1fr] items-baseline gap-8 border-t py-9">
               <span className="text-system text-muted-foreground/70 text-[10px]">
                 Outfit
               </span>
@@ -367,7 +388,7 @@ export default function StyleguidePage() {
               <p className="mb-6 text-[13px] font-medium">
                 Radius
                 <span className="text-muted-foreground/70 ml-3 font-mono text-[11px]">
-                  5px ceiling
+                  4px ceiling
                 </span>
               </p>
               <div className="grid grid-cols-3 gap-5">

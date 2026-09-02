@@ -114,7 +114,7 @@ import { HuskyMark } from "@/components/motion-ui/husky-mark"`}
         <div className="flex flex-col gap-4">
           <div className="bg-card rounded-lg border p-7">
             <p className="meta">Desktop</p>
-            <p className="body-text mt-3 text-sm">
+            <p className="body-text mt-3">
               Holds its position and size, and recedes to 10% once the page
               scrolls. It becomes a watermark rather than a subject, so it can
               stay on screen the whole way down without competing with the copy.
@@ -122,7 +122,7 @@ import { HuskyMark } from "@/components/motion-ui/husky-mark"`}
           </div>
           <div className="bg-card rounded-lg border p-7">
             <p className="meta">Phone</p>
-            <p className="body-text mt-3 text-sm">
+            <p className="body-text mt-3">
               There is no room to keep it, so on the first scroll it collapses
               into a 70px badge in the bottom-right corner and gets out of the
               way. At rest it sits 10px below centre, which drops the ears clear
@@ -131,7 +131,7 @@ import { HuskyMark } from "@/components/motion-ui/husky-mark"`}
           </div>
           <div className="bg-card rounded-lg border p-7">
             <p className="meta">Tone switching</p>
-            <p className="body-text mt-3 text-sm">
+            <p className="body-text mt-3">
               The probe is the mark&apos;s own vertical centre, not the section
               entering the viewport, so the repaint fires exactly as a boundary
               crosses the middle of the wolf. One condition governs it, so

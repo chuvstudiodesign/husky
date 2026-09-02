@@ -123,7 +123,7 @@ export default function ModernOverviewPage() {
                   {c.name}
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className="body-text block text-sm">{c.line}</span>
+                  <span className="body-text block">{c.line}</span>
                   <span className="meta mt-2 block">{c.from}</span>
                 </span>
               </Link>
@@ -139,7 +139,7 @@ export default function ModernOverviewPage() {
             <h3 className="display-3 mt-4">
               Content is never withheld pending hydration.
             </h3>
-            <p className="body-text mt-4 text-sm">
+            <p className="body-text mt-4">
               The hidden starting state lives in CSS behind an{" "}
               <code className="font-mono text-[12px]">html.js</code> guard, and
               that class is set by a blocking inline script in the root layout.
@@ -148,7 +148,7 @@ export default function ModernOverviewPage() {
               readable. Only once JS is confirmed does anything hide — and it
               hides before first paint, so there is no flash either.
             </p>
-            <p className="body-text mt-3 text-sm">
+            <p className="body-text mt-3">
               This is the difference between a reveal animation and a page that
               is blank without JavaScript. Verified: the home page ships 3
               elements at{" "}
@@ -163,7 +163,7 @@ export default function ModernOverviewPage() {
             <h3 className="display-3 mt-4">
               Transform and opacity only, and reduced motion is respected.
             </h3>
-            <p className="body-text mt-4 text-sm">
+            <p className="body-text mt-4">
               Nothing animates a property that forces layout or paint, so every
               transition stays on the compositor. Where a component runs a loop
               or a per-frame update — the marquee, the counter — it writes to CSS
@@ -172,7 +172,7 @@ export default function ModernOverviewPage() {
               than through React state, so moving the cursor or counting to
               twenty never triggers a render.
             </p>
-            <p className="body-text mt-3 text-sm">
+            <p className="body-text mt-3">
               Every component honours{" "}
               <code className="font-mono text-[12px]">
                 prefers-reduced-motion
