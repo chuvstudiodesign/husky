@@ -129,7 +129,7 @@ export function HalfMark({
 
     // The mark locates the page itself rather than being told where it is: its
     // own parent is the element the sections are laid out in, on every route
-    // that mounts it — the wrapper div on the home and site-1 pages, `main` on
+    // that mounts it — the wrapper div on the home and v2 pages, `main` on
     // /new-construction. `:scope > section` therefore reads the page's own
     // top-level sections and nothing nested inside them. Read once: sections
     // do not appear or disappear after mount, and re-querying on every frame

@@ -20,7 +20,7 @@ export default function SmoothScrollPage() {
           position instead of replacing it, so all of that survives.
         </p>
         <p className="body-text mt-4">
-          Try it on <code className="font-mono text-[12px]">/site-1</code>, which is
+          Try it on <code className="font-mono text-[12px]">/v2</code>, which is
           wrapped in it. The main site is not.
         </p>
       </ShowcaseSection>
