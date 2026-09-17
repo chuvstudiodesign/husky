@@ -31,6 +31,7 @@ export const navigation: NavSection[] = [
       { name: "Fold Text", href: "/styleguide/modern/fold-text" },
       { name: "Section Index", href: "/styleguide/modern/section-index" },
       { name: "Expanding List", href: "/styleguide/modern/expanding-list" },
+      { name: "Sticky Steps", href: "/styleguide/modern/sticky-steps" },
       { name: "Grain", href: "/styleguide/modern/grain" },
     ],
   },

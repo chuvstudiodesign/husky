@@ -3,11 +3,17 @@ import { Geist, Geist_Mono, Outfit } from "next/font/google";
 import "./globals.css";
 
 /* Primary display typeface — geometric, structural, robust.
-   Used for high-end luxury headings. (Figma 03 — Typography) */
+   Used for high-end luxury headings. (Figma 03 — Typography)
+
+   Loaded as a VARIABLE font: omitting `weight` makes next/font serve the single
+   variable file with its full `wght` axis (100–900) rather than five static cuts.
+   That is both fewer bytes and a hard requirement for VariableProximity, which
+   interpolates `font-variation-settings: 'wght'` to fractional values — static
+   instances would snap to the nearest cut and the effect would read as a stepped
+   flicker instead of a smooth swell. */
 const outfit = Outfit({
   variable: "--font-outfit",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700", "900"],
   display: "swap",
 });
 

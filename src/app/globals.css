@@ -502,6 +502,21 @@
   }
 }
 
+/* StickySteps — the pinned readout swapping to the next step. Changing
+   textContent cannot transition, so the readout is remounted on a React key and
+   this plays on entry. The reduced-motion block below collapses the duration,
+   which lands it on the `to` state immediately. */
+@keyframes husky-step-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+  to {
+    opacity: 1;
+    translate: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -856,6 +871,104 @@ main section.bg-background {
     transform: rotateX(0deg);
     opacity: 1;
   }
+
+  /* --- Sticky steps: which step is current ---
+     The dim is a colour swap, not an opacity fade. Dropping an inactive step to
+     40% would take `--muted-foreground` body copy well under the 4.5:1 floor for
+     a reader who simply has not scrolled there yet. Body copy therefore never
+     changes contrast; the title steps between two real tokens and the rule takes
+     the accent. With no JS nothing is dimmed at all, because nothing could ever
+     un-dim it. */
+  [data-sticky-step] [data-step-title] {
+    color: var(--muted-foreground);
+    transition: color 0.22s ease-out;
+  }
+
+  [data-sticky-step][data-active] [data-step-title] {
+    color: var(--foreground);
+  }
+
+  [data-sticky-step] [data-step-index] {
+    color: var(--muted-foreground);
+    transition: color 0.22s ease-out;
+  }
+
+  [data-sticky-step][data-active] [data-step-index] {
+    color: var(--foreground);
+  }
+
+  [data-sticky-step] [data-step-rule] {
+    background: var(--border);
+    transition: background-color 0.22s ease-out;
+  }
+
+  [data-sticky-step][data-active] [data-step-rule] {
+    background: var(--primary);
+  }
+
+  [data-step-readout] {
+    animation: husky-step-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* --- Scramble label ---
+     The finished string is server-rendered, so with no JS it is simply there.
+     Once scripting is confirmed the visible copy waits, hidden, until the label
+     scrolls into view and the resolve can actually run — otherwise the reader
+     would see the answer, then watch it dissolve into noise and come back. */
+  [data-scramble-out] {
+    opacity: 0;
+    transition: opacity 0.15s ease-out;
+  }
+
+  [data-scramble][data-revealed] [data-scramble-out] {
+    opacity: 1;
+  }
+
+  /* --- Split-flap board ---
+     Three states per cell: unlit (blank flap, `--secondary` fill), churning
+     (glyph visible in `--muted-foreground`, shuttling), settled (`--foreground`
+     on `--card`). `--muted` would be the obvious off fill but it is identical to
+     `--card` in the light theme, which would erase the difference. */
+  [data-flap-cell] {
+    background: var(--secondary);
+  }
+
+  [data-flap-glyph] {
+    opacity: 0;
+    color: var(--muted-foreground);
+    transition:
+      translate 0.09s ease-out,
+      opacity 0.15s ease-out,
+      color 0.18s ease-out;
+  }
+
+  [data-flap-cell][data-flap-churning] [data-flap-glyph] {
+    opacity: 1;
+  }
+
+  /* The churn, not a card flip: the glyph shuttles a few percent as it changes.
+     Two alternating targets and a transition shorter than the swap interval is
+     all it takes to read as mechanical. */
+  [data-flap-cell][data-flap-tick="a"] [data-flap-glyph] {
+    translate: 0 -12%;
+  }
+
+  [data-flap-cell][data-flap-tick="b"] [data-flap-glyph] {
+    translate: 0 12%;
+  }
+
+  [data-flap-cell][data-flap-settled] {
+    background: var(--card);
+  }
+
+  [data-flap-cell][data-flap-settled] [data-flap-glyph] {
+    opacity: 1;
+    translate: none;
+    color: var(--foreground);
+    transition:
+      translate 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+      color 0.2s ease-out;
+  }
 }
 
 /* Per-element opt-out, phones only.
@@ -887,7 +1000,12 @@ main section.bg-background {
      rather than getting their own; a second reduced-motion rule with a
      look-alike declaration is what the minifier eats. */
   [data-text-reveal] > span,
-  [data-parallax] {
+  [data-parallax],
+  /* Same reasoning for the two components whose JS bails out under reduced
+     motion: their markup already holds the finished string, so all that is
+     needed is to cancel the waiting state. Nothing branches in React. */
+  [data-scramble-out],
+  [data-flap-glyph] {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
@@ -908,4 +1026,75 @@ main section.bg-background {
   [data-fold] [data-fold-unit] {
     translate: 0 0 !important;
   }
+
+  /* A board that will never churn is a settled board. */
+  [data-flap-cell] {
+    background: var(--card) !important;
+  }
+
+  [data-flap-glyph] {
+    color: var(--foreground) !important;
+  }
+
+  /* The sticky readout is remounted on a key change, so it must not re-enter. */
+  [data-step-readout] {
+    animation: none !important;
+  }
+}
+
+/* ============================================================
+   LIGHT SCOPE
+   ------------------------------------------------------------
+   The app ships `dark` on <html>, and a nested layout cannot
+   remove a class from its parent. This re-declares the light
+   token set on a container instead, so a single route can run
+   light without touching the root or the approved pages.
+
+   Values are copied from `:root`, not re-invented — the light
+   theme already exists and is documented in the styleguide.
+
+   Contrast, measured on white:
+     navy-900  15.54:1   headings and body
+     grey-700   6.24:1   muted text
+     husky-600  4.74:1   orange TEXT
+     husky-500  3.21:1   large text only, never body
+   So `--primary` stays the true brand orange for surfaces and
+   large type, and small orange text uses husky-600.
+   ============================================================ */
+
+.theme-light {
+  --background: #ffffff;
+  --foreground: #15243d;
+  --card: #f3f6fa;
+  --card-foreground: #15243d;
+  --popover: #ffffff;
+  --popover-foreground: #15243d;
+  --primary: #ec663d;
+  --primary-foreground: #ffffff;
+  --secondary: #e7eaef;
+  --secondary-foreground: #15243d;
+  --muted: #f3f6fa;
+  --muted-foreground: #5b616b;
+  --accent: #ffe3da;
+  --accent-foreground: #a43812;
+  --destructive: #d92d20;
+  --destructive-foreground: #ffffff;
+  --border: #d5d9e1;
+  --input: #bec4cd;
+  --ring: #ec663d;
+  --success: #047857;
+  --warning: #b45309;
+  --info: #46618e;
+  --shadow-subtle: 0 1px 2px 0 rgb(21 36 61 / 0.06);
+  --shadow-raised: 0 2px 8px -2px rgb(21 36 61 / 0.10);
+  --shadow-overlay: 0 8px 28px -8px rgb(21 36 61 / 0.18);
+
+  background: var(--background);
+  color: var(--foreground);
+}
+
+/* The eyebrow is the one place orange runs at 11px. On a light ground the
+   true brand orange measures 2.96:1 there, so it steps to husky-600. */
+.theme-light .eyebrow {
+  color: var(--husky-600);
 }

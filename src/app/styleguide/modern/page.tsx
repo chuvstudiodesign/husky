@@ -93,6 +93,12 @@ const components = [
     from: "Cult UI · specification layouts",
   },
   {
+    name: "Sticky Steps",
+    href: "/styleguide/modern/sticky-steps",
+    line: "A pinned readout on the left, steps scrolling past it on the right.",
+    from: "Editorial / product walkthroughs",
+  },
+  {
     name: "Grain",
     href: "/styleguide/modern/grain",
     line: "A few percent of film noise over the page, to stop dark surfaces banding.",
@@ -105,7 +111,7 @@ export default function ModernOverviewPage() {
     <ShowcasePage>
       <ShowcaseHeader
         title="Modern Components"
-        description="Fifteen motion components built for the marketing site. Each takes a pattern from a contemporary React library and rebuilds it against the Husky token contract — so nothing here carries a colour, radius or typeface that isn't already in the design system."
+        description="Sixteen motion components built for the marketing site. Each takes a pattern from a contemporary React library and rebuilds it against the Husky token contract — so nothing here carries a colour, radius or typeface that isn't already in the design system."
         importPath={`import { Reveal } from "@/components/motion-ui/reveal"
 // …each lives in its own file under src/components/motion-ui/`}
       />
