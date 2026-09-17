@@ -73,12 +73,25 @@ export function Header() {
 
          Scoped to `lg` because the failing pair only exists there — below it
          the nav collapses to the menu button and no small text sits on the
-         scrim. */
-      className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-[background-color,backdrop-filter] duration-300",
-        scrolled && "bg-background/80 lg:bg-background/90 backdrop-blur-xl",
-      )}
+         scrim.
+
+         The scrim is its own layer, not a class on <header>, and the reason is
+         WebKit. `backdrop-filter` on an element makes it the containing block
+         for its fixed-position descendants in Safari, so once the bar had
+         scrolled and blurred, the mobile sheet below — `fixed top-20 bottom-0`
+         — was measured against the 80px header instead of the viewport and
+         collapsed to nothing. The menu opened at the top of the page and did
+         nothing after the first 24px of scroll. A sibling layer blurs the same
+         pixels and anchors nothing. */
+      className="fixed inset-x-0 top-0 z-40"
     >
+      <div
+        aria-hidden
+        className={cn(
+          "absolute inset-0 -z-10 transition-[background-color,backdrop-filter] duration-300",
+          scrolled && "bg-background/80 lg:bg-background/90 backdrop-blur-xl",
+        )}
+      />
       <div className="section-x mx-auto flex h-20 max-w-7xl items-center justify-between">
         {/* `h-11` — the mark is 30px and the wordmark's line box is smaller, so
             the link rendered a 30px target inside an 80px row. Forty-four is
