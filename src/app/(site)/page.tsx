@@ -41,9 +41,9 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <div className="relative">
-      {/* On phones the resting mark drops half its own height below centre, so it
+      {/* On phones the resting mark drops 30% of its own height below centre, so it
           clears the headline. Desktop and the docked badge are unaffected. */}
-      <HalfMark mobileDrop={50} />
+      <HalfMark mobileDrop={30} />
       <Hero />
       <Stats />
       <Services />
