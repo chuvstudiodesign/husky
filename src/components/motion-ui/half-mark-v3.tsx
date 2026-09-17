@@ -30,6 +30,12 @@ export interface HalfMarkProps extends React.ComponentProps<"div"> {
   height?: number;
   /** Viewport height it occupies at rest, on a phone. */
   mobileHeight?: number;
+  /**
+   * Extra distance the resting mark drops below centre on a phone, as a
+   * percentage of its own height, so it clears the headline. Rest state only —
+   * the docked corner badge is unaffected. Defaults to 0.
+   */
+  mobileDrop?: number;
   /** Edge length of the docked badge, in pixels. */
   dockedSize?: number;
   /** Pixels of scroll before it docks or recedes. */
@@ -75,6 +81,7 @@ export interface HalfMarkProps extends React.ComponentProps<"div"> {
 export function HalfMark({
   height = 78,
   mobileHeight = 49.4,
+  mobileDrop = 0,
   dockedSize = 70,
   threshold = 8,
   darkOver = DEFAULT_DARK_OVER,
@@ -153,8 +160,9 @@ export function HalfMark({
               "md:top-1/2 md:right-0 md:bottom-auto md:h-[var(--mark-h)] md:translate-x-1/2 md:-translate-y-1/2 md:opacity-10",
             ]
           : [
-              // Phone at rest sits 10px below centre; desktop stays centred.
-              "top-1/2 right-0 bottom-auto h-[var(--mark-h-sm)] translate-x-1/2 -translate-y-[calc(50%-10px)] opacity-100",
+              // Phone at rest sits 10px below centre, plus whatever `mobileDrop`
+              // asks for; desktop stays centred.
+              "top-1/2 right-0 bottom-auto h-[var(--mark-h-sm)] translate-x-1/2 -translate-y-[calc(50%-10px-var(--mark-drop))] opacity-100",
               "md:h-[var(--mark-h)] md:-translate-y-1/2",
             ],
         className,
@@ -163,6 +171,7 @@ export function HalfMark({
         {
           "--mark-h": `${height}vh`,
           "--mark-h-sm": `${mobileHeight}vh`,
+          "--mark-drop": `${mobileDrop}%`,
           "--mark-docked": `${dockedSize}px`,
           ...style,
         } as React.CSSProperties
