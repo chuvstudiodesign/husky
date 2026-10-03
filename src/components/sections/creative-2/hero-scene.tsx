@@ -179,6 +179,39 @@ const INTRO_TOTAL = 5;
 const INTRO_DRAW = 3.2;
 const INTRO_FILL = 4.2;
 
+/**
+ * The white wash over the house at rest, seen through the mark (client,
+ * 2026-10-03: the dusk photo read too dark inside the mark; orange was tried
+ * first and rejected). The first scroll takes it to 0 (`fadeTint`). The class
+ * carries the resting opacity; `TINT_REST` is the same number for the tween.
+ */
+const TINT_CLASS = "bg-foreground absolute inset-0 opacity-15";
+const TINT_REST = 0.15;
+/** Desktop: page scroll, in px, over which the wash goes to 0. The mark is in
+ *  the first viewport there, so the wash clears with the first movement. */
+const TINT_OUT = 120;
+
+/**
+ * The wash's own scrub. On the phone the mark starts below the fold, so a fade
+ * on the page's first pixels would be over before anyone saw it: there it runs
+ * as the mark's window crosses the middle of the screen, and is done just
+ * before the stage sticks.
+ */
+function fadeTint(frame: HTMLElement, win?: HTMLElement) {
+  gsap.fromTo(
+    frame.querySelectorAll("[data-hero-tint]"),
+    { opacity: TINT_REST },
+    {
+      opacity: 0,
+      ease: "none",
+      immediateRender: false,
+      scrollTrigger: win
+        ? { trigger: win, start: "top 50%", end: "top 30%", scrub: SCRUB }
+        : { start: 0, end: TINT_OUT, scrub: SCRUB },
+    },
+  );
+}
+
 /** If the photo or fonts stall, the intro plays anyway after this long. */
 const INTRO_TIMEOUT = 2500;
 
@@ -336,6 +369,7 @@ export function HeroScene({
       const geo = zoomGeometry();
       const measure = () => measureZoom(geo, win, frame);
       measure();
+      fadeTint(frame);
 
       // The veil's camera, in viewBox units. Applied as an SVG transform
       // attribute (vector, so the cut's edge stays sharp at any scale);
@@ -454,6 +488,7 @@ export function HeroScene({
       const geo = zoomGeometry();
       const measure = () => measureZoom(geo, win, stage);
       measure();
+      fadeTint(frame, win);
 
       const cam = { s: 1, x: 0, y: 0 };
       gsap
@@ -540,6 +575,7 @@ export function HeroScene({
               {photoEnd}
             </div>
           </div>
+          <div data-hero-tint="" className={TINT_CLASS} />
         </div>
         <div
           data-hero-dim=""
@@ -577,6 +613,7 @@ export function HeroScene({
             >
               {photoEndPhone}
             </div>
+            <div data-hero-tint="" className={TINT_CLASS} />
             <div
               data-hero-dim-phone=""
               className="bg-background absolute inset-0 opacity-0"
