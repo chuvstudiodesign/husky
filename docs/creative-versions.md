@@ -1,5 +1,21 @@
 # Creative versions: direction for `/creative-1`, `/creative-2`, `/creative-3`
 
+> **2026-10-02 — `/creative-2` is now Low Voltage, second pass.** The client asked for a copy
+> of `/creative-1` with a first round of edits, kept separate so nothing in Creative 1 is lost.
+> Sections live in `src/components/sections/creative-2/`. Changes from Creative 1:
+>
+> - **Hero:** the photo is full-bleed and still; the mark is cut out of a dark veil over it,
+>   and the scroll zoom scales only the veil (about the chin, the mark's largest solid block)
+>   until the cut is the whole frame. No layer B. The outline intro is played by JS once
+>   fonts, the photo's decode and the pin are ready (in Creative 1 the CSS animation was
+>   restarted by the pin re-parenting the frame, and was mostly over before first paint).
+> - **Services:** the plate photos are replaced by eight drawn icons in the mark's vocabulary
+>   (`service-icons.tsx`), each drawing itself line by line with one orange status square.
+> - **Approach:** the device points go out once the walls close.
+> - **Copy:** every em dash in the page's copy is a comma (client order).
+>
+> The Afterdark direction below, if built, needs a new slug.
+
 Three new alternative home pages. They exist because the client found the current site
 visually unambitious. Each version is a **different design**: different composition,
 visual construction, type treatment and motion language. They are **not** different
