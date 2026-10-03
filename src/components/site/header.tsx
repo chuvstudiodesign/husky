@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -11,17 +12,58 @@ import { HuskyWordmark } from "@/components/motion-ui/husky-wordmark";
 
 const WHATSAPP = "https://api.whatsapp.com/send?phone=19548648005";
 
-const links = [
-  // Plain route link, not an anchor: the rest are hash targets on the home page
-  // and this one has to work identically from /new-construction.
-  { label: "Home", href: "/" },
-  { label: "Services", href: "/#services" },
-  { label: "Approach", href: "/#approach" },
-  { label: "About", href: "/#about" },
-  { label: "New Construction", href: "/new-construction" },
-];
+/**
+ * The nav belongs to whichever home the visitor is on. `/creative-2` is a whole
+ * alternative site with its own New Construction page, so from anywhere under
+ * it the links stay inside it; everywhere else they point at `/`.
+ */
+const HOMES = [
+  {
+    home: "/creative-2",
+    top: "#home",
+    newConstruction: "/creative-2/new-construction",
+  },
+  { home: "/", top: "#start", newConstruction: "/new-construction" },
+] as const;
+
+function linksFor(pathname: string) {
+  const { home, top, newConstruction } =
+    HOMES.find(
+      (h) => pathname === h.home || pathname.startsWith(`${h.home}/`),
+    ) ?? HOMES[HOMES.length - 1];
+  // On the home itself the section links are bare hashes: a same-page anchor,
+  // which SmoothScroll eases to. From any other page they carry the route.
+  const at = pathname === home ? "" : home;
+  return {
+    home,
+    links: [
+      // The top of the home when already on it, the route from anywhere else.
+      { label: "Home", href: pathname === home ? top : home },
+      { label: "Services", href: `${at}#services` },
+      { label: "Approach", href: `${at}#approach` },
+      { label: "About", href: `${at}#about` },
+      { label: "New Construction", href: newConstruction },
+    ],
+  };
+}
+
+/**
+ * A same-page hash is a plain anchor, not a `Link`: the router would take the
+ * click first and jump, where SmoothScroll (or the browser) should scroll.
+ */
+function NavLink({
+  href,
+  ...props
+}: React.ComponentProps<"a"> & { href: string }) {
+  return href.startsWith("#") ? (
+    <a href={href} {...props} />
+  ) : (
+    <Link href={href} {...props} />
+  );
+}
 
 export function Header() {
+  const { home, links } = linksFor(usePathname());
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -99,7 +141,7 @@ export function Header() {
             the extra 14px is transparent, and the row is `items-center` so the
             logo stays where it was. */}
         <Link
-          href="/"
+          href={home}
           className="flex h-11 items-center gap-3"
           aria-label="Husky Audio Video, home"
         >
@@ -132,13 +174,13 @@ export function Header() {
             mono labels use. */}
         <nav className="hidden items-center gap-9 lg:flex">
           {links.map((l) => (
-            <Link
-              key={l.href}
+            <NavLink
+              key={l.label}
               href={l.href}
               className="nav-text text-muted-foreground hover:text-foreground uppercase tracking-[0.08em] transition-colors"
             >
               {l.label}
-            </Link>
+            </NavLink>
           ))}
         </nav>
 
@@ -202,14 +244,14 @@ export function Header() {
             type on empty background, which is what a phone menu should be. */}
         <nav className="section-x flex flex-col gap-1 pt-8 pb-10">
           {links.map((l) => (
-            <Link
-              key={l.href}
+            <NavLink
+              key={l.label}
               href={l.href}
               onClick={() => setOpen(false)}
               className="font-display py-5 text-2xl font-semibold tracking-tight"
             >
               {l.label}
-            </Link>
+            </NavLink>
           ))}
           {/* Full width on a phone, the standard 176px box from sm. In a 342px
               column under five full-bleed display lines the fixed rectangle

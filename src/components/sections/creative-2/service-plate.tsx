@@ -35,7 +35,7 @@ export function ServicePlate({ service, index, total }: ServicePlateProps) {
   return (
     <article
       data-plate=""
-      className="group relative flex flex-col gap-6 in-data-[mode=track]:w-[30vw] in-data-[mode=track]:shrink-0"
+      className="group relative flex flex-col gap-6 in-data-[mode=track]:w-[30vw] in-data-[mode=track]:shrink-0 max-md:in-data-[mode=track]:w-[60vw]"
     >
       {/* Junction on the horizontal cable, 32px above the image top. */}
       <span

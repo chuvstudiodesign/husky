@@ -7,6 +7,13 @@ import { HERO } from "@/components/sections/creative-2/content";
 import { HeroScene } from "@/components/sections/creative-2/hero-scene";
 
 /**
+ * The photo covers a full-height frame, and it is 2.89:1, so on anything
+ * narrower than that it is laid out by height: 289vh wide, not 100vw. Telling
+ * the browser 100vw had it pick a file for a third of the pixels drawn.
+ */
+const PHOTO_SIZES = "(min-aspect-ratio: 289/100) 100vw, 289vh";
+
+/**
  * Creative 2 — Hero. A still dusk house behind a dark veil, seen through the
  * Husky mark cut out of it; scrolling grows the cut until the house fills the
  * screen. The house never moves; only the hole does.
@@ -19,7 +26,7 @@ import { HeroScene } from "@/components/sections/creative-2/hero-scene";
  * Spec: `docs/creative-versions.md` § 1.
  */
 export function Hero() {
-  // One URL for both placements (full-bleed on desktop, inside the window on
+  // One URL for both placements (full-bleed on desktop, behind the window on
   // the phone), so the browser fetches the photo once.
   const photo = (
     <Image
@@ -29,7 +36,8 @@ export function Hero() {
       height={HERO.image.height}
       preload
       fetchPriority="high"
-      sizes="100vw"
+      sizes={PHOTO_SIZES}
+      quality={90}
       data-scroll-scene-hero=""
       className="size-full object-cover object-[58%_55%]"
     />
@@ -39,11 +47,12 @@ export function Hero() {
     alt: "",
     width: HERO.image.width,
     height: HERO.image.height,
-    sizes: "100vw",
+    sizes: PHOTO_SIZES,
+    quality: 90,
   });
   const photoPhone = (
     // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- getImageProps output
-    <img {...phone} className="size-full object-cover" />
+    <img {...phone} className="size-full" />
   );
 
   return (

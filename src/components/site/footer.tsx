@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { HuskyWordmark } from "@/components/motion-ui/husky-wordmark";
 
 const WHATSAPP = "https://api.whatsapp.com/send?phone=19548648005";
@@ -18,24 +21,41 @@ const WHATSAPP = "https://api.whatsapp.com/send?phone=19548648005";
    computes, so nothing else moves. */
 const TAP = "inline-block py-3 leading-5 lg:inline lg:py-0";
 
-const columns = [
-  {
-    title: "Services",
-    links: [
-      { label: "Entertainment", href: "/#entertainment" },
-      { label: "Comfort & Control", href: "/#comfort-control" },
-      { label: "Infrastructure & Security", href: "/#infrastructure-security" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { label: "About", href: "/#about" },
-      { label: "Our Approach", href: "/#approach" },
-      { label: "New Construction", href: "/new-construction" },
-    ],
-  },
-];
+/**
+ * The same split the header makes: under `/creative-2` every link stays inside
+ * that version. Its services are one section, not three anchored families, so
+ * the three service links all land on `#services` there.
+ */
+function columnsFor(pathname: string) {
+  const creative2 =
+    pathname === "/creative-2" || pathname.startsWith("/creative-2/");
+  const home = creative2 ? "/creative-2" : "/";
+  const service = (id: string) => `${home}#${creative2 ? "services" : id}`;
+  return [
+    {
+      title: "Services",
+      links: [
+        { label: "Entertainment", href: service("entertainment") },
+        { label: "Comfort & Control", href: service("comfort-control") },
+        {
+          label: "Infrastructure & Security",
+          href: service("infrastructure-security"),
+        },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About", href: `${home}#about` },
+        { label: "Our Approach", href: `${home}#approach` },
+        {
+          label: "New Construction",
+          href: creative2 ? "/creative-2/new-construction" : "/new-construction",
+        },
+      ],
+    },
+  ];
+}
 
 /**
  * No `border-t` on the footer, and none on the legal strip: every route that
@@ -50,6 +70,7 @@ const columns = [
  * of it so the columns and their 4-up rhythm stay where they were.
  */
 export function Footer() {
+  const columns = columnsFor(usePathname());
   return (
     <footer className="bg-background">
       <div className="section-x mx-auto max-w-7xl py-28 md:py-36">

@@ -11,9 +11,10 @@ import { ServicesScene } from "@/components/sections/creative-2/services-scene";
  * Spec: `docs/creative-versions.md` §3.
  *
  * The server markup is the final, readable state: a vertical stack, each family
- * under a sticky header, plates in a 2-column grid from `md` up. On a motion-allowed
- * desktop the scene sets `data-mode="track"` and the same DOM becomes one horizontal
- * row that the pin scrubs sideways (every `in-data-[mode=track]:` class below).
+ * under a sticky header, plates in a 2-column grid from `md` up. With motion
+ * allowed the scene sets `data-mode="track"` and the same DOM becomes one horizontal
+ * row that the scroll scrubs sideways (every `in-data-[mode=track]:` class below;
+ * the `max-md:` ones are the phone's panel widths, where 30vw would be a sliver).
  */
 export function Services() {
   const total = SERVICES.families.reduce((n, f) => n + f.services.length, 0);
@@ -36,13 +37,13 @@ export function Services() {
     <ServicesScene readout={readout}>
       <div
         data-track=""
-        className="relative flex flex-col gap-24 in-data-[mode=track]:w-max in-data-[mode=track]:flex-row in-data-[mode=track]:items-start in-data-[mode=track]:gap-[4vw] in-data-[mode=track]:pr-[15vw]"
+        className="relative flex flex-col gap-24 in-data-[mode=track]:w-max in-data-[mode=track]:flex-row in-data-[mode=track]:items-start in-data-[mode=track]:gap-[4vw] in-data-[mode=track]:pr-[15vw] max-md:in-data-[mode=track]:gap-[8vw] max-md:in-data-[mode=track]:pr-[8vw]"
       >
         {/* Horizontal cable — 32px above the image tops, track mode only. Stops
             where the trailing room begins (the track's 15vw right padding). */}
         <div
           aria-hidden="true"
-          className="bg-foreground/12 pointer-events-none absolute right-[15vw] left-0 -top-8 hidden h-px in-data-[mode=track]:block"
+          className="bg-foreground/12 pointer-events-none absolute right-[15vw] left-0 max-md:right-[8vw] -top-8 hidden h-px in-data-[mode=track]:block"
         >
           <div
             data-hcable-fill=""
@@ -55,7 +56,7 @@ export function Services() {
         </div>
 
         {/* Panel 0 — intro */}
-        <div className="flex flex-col gap-6 in-data-[mode=track]:w-[36vw] in-data-[mode=track]:shrink-0">
+        <div className="flex flex-col gap-6 in-data-[mode=track]:w-[36vw] in-data-[mode=track]:shrink-0 max-md:in-data-[mode=track]:w-[76vw]">
           <p className="eyebrow text-muted-foreground group-data-[powered]/services:text-foreground transition-colors duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]">
             {SERVICES.eyebrow}
           </p>
@@ -78,7 +79,7 @@ export function Services() {
                 the same height as a plate image, so the row reads light plates – dark cover – light plates. */}
             <div
               data-cover=""
-              className="bg-background after:from-background sticky top-20 z-[5] pt-6 pb-4 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-8 after:bg-linear-to-b after:to-transparent in-data-[mode=track]:relative in-data-[mode=track]:top-auto in-data-[mode=track]:flex in-data-[mode=track]:h-[22.5vw] in-data-[mode=track]:w-[30vw] in-data-[mode=track]:shrink-0 in-data-[mode=track]:flex-col in-data-[mode=track]:justify-between in-data-[mode=track]:p-0 in-data-[mode=track]:after:hidden"
+              className="bg-background after:from-background sticky top-20 z-[5] pt-6 pb-4 after:pointer-events-none after:absolute after:inset-x-0 after:top-full after:h-8 after:bg-linear-to-b after:to-transparent in-data-[mode=track]:relative in-data-[mode=track]:top-auto in-data-[mode=track]:flex in-data-[mode=track]:h-[22.5vw] in-data-[mode=track]:w-[30vw] max-md:in-data-[mode=track]:h-[45vw] max-md:in-data-[mode=track]:w-[60vw] in-data-[mode=track]:shrink-0 in-data-[mode=track]:flex-col in-data-[mode=track]:justify-between in-data-[mode=track]:p-0 in-data-[mode=track]:after:hidden"
             >
               <p className="meta">{plateIndex(fi + 1, families)}</p>
               <h3 className="display-2 text-foreground in-data-[mode=track]:mt-3">
@@ -107,7 +108,7 @@ export function Services() {
         ))}
 
         {/* Final panel — CTA */}
-        <div className="flex flex-col gap-6 in-data-[mode=track]:w-[28vw] in-data-[mode=track]:shrink-0">
+        <div className="flex flex-col gap-6 in-data-[mode=track]:w-[28vw] in-data-[mode=track]:shrink-0 max-md:in-data-[mode=track]:w-[76vw]">
           <p className="meta" aria-hidden="true">
             {`${plateIndex(total, total)} · ${SERVICES.endOfRun}`}
           </p>

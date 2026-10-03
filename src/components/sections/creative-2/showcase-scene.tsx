@@ -291,6 +291,7 @@ export function ShowcaseScene() {
                 alt={SHOWCASE.image.alt}
                 fill
                 sizes="(min-width: 768px) 200vw, 320vw"
+                quality={90}
                 className="object-cover"
               />
             </div>

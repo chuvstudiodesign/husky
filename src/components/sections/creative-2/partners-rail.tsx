@@ -13,8 +13,9 @@ import { cn } from "@/lib/utils";
  * too):
  *
  *   wide     `.display-1`, ≥ md with motion allowed — the scrubbed nameplate rail
- *   compact  `.display-2`, below md (scrubbed, same code) and under reduced motion
- *            (a wrapping row of solid names)
+ *   compact  `.display-2`, below md (scrubbed, same code; a step up to 40/44 on
+ *            the phone, client 2026-10-03) and under reduced motion (a wrapping
+ *            row of solid names)
  *
  * Two lists rather than one because the type classes live in `@layer components`,
  * where Tailwind v4 generates no responsive variants (`md:display-1` is a no-op).
@@ -81,7 +82,7 @@ function Rail({
         "w-max items-center",
         wide
           ? "display-1 hidden gap-[8vw] md:motion-safe:flex"
-          : "display-2 flex gap-[12vw] md:motion-safe:hidden motion-reduce:w-auto motion-reduce:flex-wrap motion-reduce:gap-x-12 motion-reduce:gap-y-4",
+          : "display-2 flex gap-[12vw] max-md:motion-safe:text-[2.5rem] max-md:motion-safe:leading-[2.75rem] md:motion-safe:hidden motion-reduce:w-auto motion-reduce:flex-wrap motion-reduce:gap-x-12 motion-reduce:gap-y-4",
       )}
     >
       {names.map((name, i) => (

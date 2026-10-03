@@ -33,17 +33,14 @@ const CHIN_FROM_CENTRE =
   (MARK_CHIN.y - (MARK_BOX.y + MARK_BOX.height / 2)) / MARK_BOX.height;
 
 /**
- * Phone photo framing, in mark-box fractions. The photo (2.89:1) is laid out at
- * 1156 × 400 viewBox units with its point (0.66, 0.55), the lit façade, on
- * (540, 560), the head's centre.
+ * Phone photo framing. The photo fills the stage's height at its own 2.89:1 and
+ * is slid so that its point 0.66 across, the lit façade, sits on the stage's
+ * centre line, which is where the mark is.
  */
-const PHOTO_W = 1156;
-const PHOTO_H = PHOTO_W / (HERO_PHOTO.width / HERO_PHOTO.height);
-const PHOTO_PHONE = {
-  left: ((540 - 0.66 * PHOTO_W - MARK_BOX.x) / MARK_BOX.width) * 100,
-  top: ((560 - 0.55 * PHOTO_H - MARK_BOX.y) / MARK_BOX.height) * 100,
-  width: (PHOTO_W / MARK_BOX.width) * 100,
-  height: (PHOTO_H / MARK_BOX.height) * 100,
+const PHOTO_PHONE: React.CSSProperties = {
+  aspectRatio: `${HERO_PHOTO.width} / ${HERO_PHOTO.height}`,
+  left: "50%",
+  transform: "translateX(-66%)",
 };
 
 /**
@@ -57,13 +54,14 @@ const VEIL_D = `M${MARK_BOX.x - REACH} ${MARK_BOX.y - REACH}H${MARK_BOX.x + MARK
 
 /** A linear scrub on `scale` reads as a lurch then a crawl. Exponential scale
  *  is what constant camera speed looks like, so the zoom maps `p` to `to^p`. */
-const zoomEase = (to: number) => (p: number) => (Math.pow(to, p) - 1) / (to - 1);
-
-/** Phone: the hole grows at most 1.4× inside its window. */
-const MOBILE_ZOOM = 1.4;
+const zoomEase = (to: number) => (p: number) =>
+  (Math.pow(to, p) - 1) / (to - 1);
 
 /** Scales the veil by `s` about ZOOM_AT, then moves it `x`/`y` (viewBox units). */
-function setCamera(el: Element, { s, x, y }: { s: number; x: number; y: number }) {
+function setCamera(
+  el: Element,
+  { s, x, y }: { s: number; x: number; y: number },
+) {
   el.setAttribute(
     "transform",
     `translate(${ZOOM_AT.x + x} ${ZOOM_AT.y + y}) scale(${s}) translate(${-ZOOM_AT.x} ${-ZOOM_AT.y})`,
@@ -83,6 +81,32 @@ function offsetWithin(el: HTMLElement, ancestor: HTMLElement) {
   return { x, y };
 }
 
+/** Phone: how far the stage stays stuck while the hole grows, in lvh. */
+const MOBILE_TRAVEL = 140;
+
+/** The zoom anchor in `box` pixels, and how far the veil must scale for the
+ *  solid chin block, centred, to cover `box`. */
+const zoomGeometry = () => ({ ox: 0, oy: 0, w: 0, h: 0, unit: 1, zoom: 20 });
+
+function measureZoom(
+  geo: ReturnType<typeof zoomGeometry>,
+  win: HTMLElement,
+  box: HTMLElement,
+) {
+  const o = offsetWithin(win, box);
+  geo.unit = win.offsetWidth / MARK_BOX.width;
+  geo.ox = o.x + (win.offsetWidth * ORIGIN_X) / 100;
+  geo.oy = o.y + (win.offsetHeight * ORIGIN_Y) / 100;
+  geo.w = box.clientWidth;
+  geo.h = box.clientHeight;
+  geo.zoom =
+    1.1 *
+    Math.max(
+      geo.w / 2 / (ZOOM_HALF_W * geo.unit),
+      geo.h / 2 / (ZOOM_HALF_H * geo.unit),
+    );
+}
+
 /*
  * Geometry that both the static render and the scene depend on, in one place.
  *
@@ -90,6 +114,13 @@ function offsetWithin(el: HTMLElement, ancestor: HTMLElement) {
  *   --c2-col      one of 12 grid columns (gap 1.5rem), from the container width
  *   --c2-mark-w   the mark window: 72svh tall, never wider than columns 8–12
  *   --c2-chin-*   MARK_CHIN in frame coordinates; the cable starts here
+ *
+ * Phone, motion allowed: the track is 240lvh tall and the stage sticks inside it
+ * for 140lvh while the hole grows (the scene below scrubs it). Sticky rather
+ * than a ScrollTrigger pin: a pin is positioned from scroll events, which a
+ * phone delivers late, and it shudders. The track is pulled up under the copy
+ * so the mark rests 4rem below the CTAs, as it does without the stage. `lvh`,
+ * so the stage still covers the screen once the browser's bars retract.
  *
  * The intro's "before" state lives here too, keyed on `data-intro="pending"`,
  * which the server renders. It holds the outline undrawn, the photo dark and
@@ -113,6 +144,21 @@ const SCENE_CSS = `
   }
   .c2-hero-mark { width: var(--c2-mark-w); }
   .c2-hero-outline path { stroke-width: calc(${MARK_BOX.width} / 520); }
+}
+@media (max-width: 47.99rem) and (prefers-reduced-motion: no-preference) {
+  .c2-hero-frame { padding-bottom: 0; }
+  .c2-hero-track {
+    height: ${100 + MOBILE_TRAVEL}lvh;
+    margin-top: calc(4rem - 50lvh + 40vw * ${MARK_BOX.height} / ${MARK_BOX.width});
+  }
+  .c2-hero-stage {
+    position: sticky;
+    top: 0;
+    height: 100lvh;
+    margin-inline: calc(-1 * var(--c2-g));
+    align-items: center;
+    overflow: clip;
+  }
 }
 .c2-hero-outline path { stroke-dasharray: 1; stroke-opacity: 0.24; }
 @media (prefers-reduced-motion: no-preference) {
@@ -144,8 +190,9 @@ export interface HeroSceneProps {
  * from the chin. It waits for the fonts, the photo's decode and the scroll
  * scene's pin, so nothing restarts it or plays it unseen behind hydration.
  *
- * Scroll (desktop): the veil scales about the chin, so the mark-shaped hole
- * grows over the still house until it is the whole frame.
+ * Scroll: the veil scales about the chin, so the mark-shaped hole grows over
+ * the still house until it is the whole frame. On desktop the frame is pinned
+ * for it; on the phone the mark's stage sticks instead (see SCENE_CSS).
  */
 export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
   const frameRef = useRef<HTMLDivElement>(null);
@@ -203,13 +250,27 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
         // The house comes up inside the finished line…
         .to(photos, { opacity: 1, duration: 1.1, ease: "power1.out" }, "-=0.5")
         // …as the line settles back to its hairline.
-        .to(paths, { strokeOpacity: 0.24, duration: 1.1, ease: "power1.out" }, "<")
+        .to(
+          paths,
+          { strokeOpacity: 0.24, duration: 1.1, ease: "power1.out" },
+          "<",
+        )
         // The cable leaves the chin: down, then out to the gutter.
-        .to(connectors[0] ?? [], { scale: 1, duration: 0.3, ease: "power2.out" }, "-=0.7")
-        .to(connectors[1] ?? [], { scale: 1, duration: 0.45, ease: "power2.out" }, ">-0.05");
+        .to(
+          connectors[0] ?? [],
+          { scale: 1, duration: 0.3, ease: "power2.out" },
+          "-=0.7",
+        )
+        .to(
+          connectors[1] ?? [],
+          { scale: 1, duration: 0.45, ease: "power2.out" },
+          ">-0.05",
+        );
     };
 
-    const img = frame.querySelector<HTMLImageElement>("[data-scroll-scene-hero]");
+    const img = frame.querySelector<HTMLImageElement>(
+      "[data-scroll-scene-hero]",
+    );
     const ready = Promise.all([
       document.fonts.ready,
       img?.decode().catch(() => undefined),
@@ -241,23 +302,8 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
       const photoMove = q("[data-hero-photo-move]")[0];
       if (!win || !zoom) return;
 
-      // The zoom anchor in frame pixels, and how far it must scale for the
-      // solid chin block, centred, to cover the frame.
-      const geo = { ox: 0, oy: 0, w: 0, h: 0, unit: 1, zoom: 20 };
-      const measure = () => {
-        const o = offsetWithin(win, frame);
-        geo.unit = win.offsetWidth / MARK_BOX.width;
-        geo.ox = o.x + (win.offsetWidth * ORIGIN_X) / 100;
-        geo.oy = o.y + (win.offsetHeight * ORIGIN_Y) / 100;
-        geo.w = frame.clientWidth;
-        geo.h = frame.clientHeight;
-        geo.zoom =
-          1.1 *
-          Math.max(
-            geo.w / 2 / (ZOOM_HALF_W * geo.unit),
-            geo.h / 2 / (ZOOM_HALF_H * geo.unit),
-          );
-      };
+      const geo = zoomGeometry();
+      const measure = () => measureZoom(geo, win, frame);
       measure();
 
       // The veil's camera, in viewBox units. Applied as an SVG transform
@@ -284,11 +330,23 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
         // 0 → 0.30  eyebrow, lead and CTA row lift away
         .to(q("[data-hero='fade']"), { y: -32, opacity: 0, duration: 0.3 }, 0)
         // 0 → 0.45  the two h1 lines part; fade from 0.25
-        .to(q("[data-hero-line='0']"), { x: () => -0.14 * window.innerWidth, duration: 0.45 }, 0)
-        .to(q("[data-hero-line='1']"), { x: () => 0.14 * window.innerWidth, duration: 0.45 }, 0)
+        .to(
+          q("[data-hero-line='0']"),
+          { x: () => -0.14 * window.innerWidth, duration: 0.45 },
+          0,
+        )
+        .to(
+          q("[data-hero-line='1']"),
+          { x: () => 0.14 * window.innerWidth, duration: 0.45 },
+          0,
+        )
         .to(q("[data-hero-line]"), { opacity: 0, duration: 0.2 }, 0.25)
         // 0 → 0.20  outline and the cable's chin connector
-        .to(q("[data-hero-outline], [data-hero-connector]"), { opacity: 0, duration: 0.2 }, 0)
+        .to(
+          q("[data-hero-outline], [data-hero-connector]"),
+          { opacity: 0, duration: 0.2 },
+          0,
+        )
         // 0 → 0.60  the hole grows over the still house until it is the frame
         .fromTo(
           cam,
@@ -318,9 +376,16 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
       // Pointer: the house drifts ±12px against the cursor, a look through a
       // window. Only the photo layer moves; the mark stays put.
       const reset = () => zoom.removeAttribute("transform");
-      if (!photoMove || !window.matchMedia("(hover: hover)").matches) return reset;
-      const toX = gsap.quickTo(photoMove, "x", { duration: 0.6, ease: "power3.out" });
-      const toY = gsap.quickTo(photoMove, "y", { duration: 0.6, ease: "power3.out" });
+      if (!photoMove || !window.matchMedia("(hover: hover)").matches)
+        return reset;
+      const toX = gsap.quickTo(photoMove, "x", {
+        duration: 0.6,
+        ease: "power3.out",
+      });
+      const toY = gsap.quickTo(photoMove, "y", {
+        duration: 0.6,
+        ease: "power3.out",
+      });
       const onMove = (e: PointerEvent) => {
         const r = frame.getBoundingClientRect();
         toX(-((e.clientX - r.left) / r.width - 0.5) * 24);
@@ -341,9 +406,16 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
 
     mobile: ({ scope: frame }) => {
       const q = gsap.utils.selector(frame);
-      const win = q("[data-hero-window]")[0];
-      const zoom = q("[data-hero-zoom]")[0];
-      if (!win || !zoom) return;
+      const track = q("[data-hero-track]")[0] as HTMLElement | undefined;
+      const stage = q("[data-hero-stage]")[0] as HTMLElement | undefined;
+      const win = q("[data-hero-window]")[0] as HTMLElement | undefined;
+      const zoom = q("[data-hero-zoom]")[0] as Element | undefined;
+      const dim = q("[data-hero-dim-phone]")[0];
+      if (!track || !stage || !win || !zoom) return;
+
+      const geo = zoomGeometry();
+      const measure = () => measureZoom(geo, win, stage);
+      measure();
 
       const cam = { s: 1, x: 0, y: 0 };
       gsap
@@ -351,15 +423,49 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
           defaults: { ease: "none" },
           onUpdate: () => setCamera(zoom, cam),
           scrollTrigger: {
-            trigger: win,
-            start: "top 80%",
-            end: "bottom top",
+            // The stage is stuck for exactly this stretch: from the track's
+            // top reaching the screen's to its foot reaching the stage's.
+            trigger: track,
+            start: "top top",
+            end: () => `+=${track.offsetHeight - stage.offsetHeight}`,
             scrub: SCRUB,
+            invalidateOnRefresh: true,
+            onRefresh: measure,
           },
         })
-        // Capped at 1.4: past that the window reads as a plain photo
-        // rectangle and the mark is lost.
-        .fromTo(cam, { s: 1 }, { s: MOBILE_ZOOM, ease: zoomEase(MOBILE_ZOOM), duration: 1 }, 0);
+        // 0 → 0.12  the copy still on screen above the mark clears the photo
+        .to(
+          q("[data-hero='fade'], [data-hero-line]"),
+          { opacity: 0, duration: 0.12 },
+          0,
+        )
+        // 0 → 0.15  outline
+        .to(q("[data-hero-outline]"), { opacity: 0, duration: 0.15 }, 0)
+        // 0 → 0.70  the hole grows over the still house until it is the screen
+        .fromTo(
+          cam,
+          { s: 1 },
+          {
+            s: () => (measure(), geo.zoom),
+            ease: (p: number) => zoomEase(geo.zoom)(p),
+            duration: 0.7,
+          },
+          0,
+        )
+        // 0 → 0.50  …while the chin drifts to the stage's centre
+        .fromTo(
+          cam,
+          { x: 0, y: 0 },
+          {
+            x: () => (geo.w / 2 - geo.ox) / geo.unit,
+            y: () => (geo.h / 2 - geo.oy) / geo.unit,
+            ease: "sine.inOut",
+            duration: 0.5,
+          },
+          0,
+        )
+        // 0.80 → 1.00  dim for the hand-off to the light Stats band
+        .fromTo(dim, { opacity: 0 }, { opacity: 0.55, duration: 0.2 }, 0.8);
       return () => zoom.removeAttribute("transform");
     },
   });
@@ -386,56 +492,69 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
             {photo}
           </div>
         </div>
-        <div data-hero-dim="" className="bg-background absolute inset-0 opacity-0" />
+        <div
+          data-hero-dim=""
+          className="bg-background absolute inset-0 opacity-0"
+        />
       </div>
 
       {/* Copy — columns 1–7 */}
       <div className="relative z-20 md:col-span-7">{children}</div>
 
-      {/* Mark window — columns 8–12 */}
-      <div className="relative z-10 mt-16 flex justify-center md:col-span-5 md:mt-0">
+      {/* Mark window — columns 8–12. On the phone the track and the stage give
+          the mark a screen-high sticky box of its own; from md the stage
+          dissolves and the window is the track's only child. */}
+      <div
+        data-hero-track=""
+        className="c2-hero-track relative z-10 mt-16 md:col-span-5 md:mt-0 md:flex md:justify-center"
+      >
         <div
-          data-hero-window=""
-          className="c2-hero-mark relative aspect-[308/372] max-md:overflow-hidden"
+          data-hero-stage=""
+          className="c2-hero-stage relative flex justify-center md:contents"
         >
-          {/* The house (phone): still, inside the window box. */}
+          {/* The house (phone): still, behind the veil, across the stage. */}
           <div
             aria-hidden="true"
             data-hero-photo=""
             className="absolute inset-0 md:hidden"
           >
-            <div
-              className="absolute"
-              style={{
-                left: `${PHOTO_PHONE.left}%`,
-                top: `${PHOTO_PHONE.top}%`,
-                width: `${PHOTO_PHONE.width}%`,
-                height: `${PHOTO_PHONE.height}%`,
-              }}
-            >
+            <div className="absolute inset-y-0" style={PHOTO_PHONE}>
               {photoPhone}
             </div>
+            <div
+              data-hero-dim-phone=""
+              className="bg-background absolute inset-0 opacity-0"
+            />
           </div>
 
-          {/* The veil with the mark cut out, and the 1px outline on the cut. */}
-          <svg
-            aria-hidden="true"
-            viewBox={MARK_VIEWBOX}
-            className="absolute inset-0 size-full overflow-visible"
+          <div
+            data-hero-window=""
+            className="c2-hero-mark relative aspect-[308/372]"
           >
-            <g data-hero-zoom="">
-              <path d={VEIL_D} fillRule="evenodd" className="fill-background" />
-              <g
-                data-hero-outline=""
-                className="c2-hero-outline text-foreground"
-                fill="none"
-              >
-                {MARK_PATHS.map((d) => (
-                  <path key={d} d={d} pathLength={1} stroke="currentColor" />
-                ))}
+            {/* The veil with the mark cut out, and the 1px outline on the cut. */}
+            <svg
+              aria-hidden="true"
+              viewBox={MARK_VIEWBOX}
+              className="absolute inset-0 size-full overflow-visible"
+            >
+              <g data-hero-zoom="">
+                <path
+                  d={VEIL_D}
+                  fillRule="evenodd"
+                  className="fill-background"
+                />
+                <g
+                  data-hero-outline=""
+                  className="c2-hero-outline text-foreground"
+                  fill="none"
+                >
+                  {MARK_PATHS.map((d) => (
+                    <path key={d} d={d} pathLength={1} stroke="currentColor" />
+                  ))}
+                </g>
               </g>
-            </g>
-          </svg>
+            </svg>
+          </div>
         </div>
       </div>
 
