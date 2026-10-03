@@ -7,7 +7,10 @@ import {
   registerGsap,
   scheduleRefresh,
 } from "@/components/motion-ui/gsap-setup";
-import { LENIS_READY_EVENT } from "@/components/motion-ui/smooth-scroll";
+import {
+  LENIS_READY_EVENT,
+  anchorTarget,
+} from "@/components/motion-ui/smooth-scroll";
 
 /** How long after mount a hash arrival keeps being re-landed, in ms. */
 const LANDING_WINDOW = 4000;
@@ -80,10 +83,11 @@ export function ScrollSceneRoot({
       window.clearTimeout(landingTimer);
     };
     const land = () => {
-      const target = document.getElementById(
+      const section = document.getElementById(
         decodeURIComponent(window.location.hash.slice(1)),
       );
-      if (!target) return;
+      if (!section) return;
+      const target = anchorTarget(section);
       if (window.__lenis) {
         window.__lenis.scrollTo(target, { immediate: true, force: true });
       } else {

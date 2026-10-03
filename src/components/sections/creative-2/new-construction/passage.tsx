@@ -34,6 +34,7 @@ export function Passage({
   const light = tone === "light";
   const split = layout === "split";
   const titleId = `${copy.id}-title`;
+  const lines = copy.h2.split("\n");
 
   return (
     <section
@@ -67,9 +68,44 @@ export function Passage({
             id={titleId}
             className={cn("display-2 mt-6", light && "text-navy-900")}
           >
-            <ScrubText as="span" start="top 85%" end="top 55%" className="block">
-              {copy.h2}
-            </ScrubText>
+            {lines.length === 1 ? (
+              <ScrubText
+                as="span"
+                start="top 85%"
+                end="top 55%"
+                className="block"
+              >
+                {copy.h2}
+              </ScrubText>
+            ) : (
+              // An authored break. SplitText re-flows text into its own line
+              // boxes and drops a newline, so from `lg` each authored line is
+              // its own split; below it the heading is one run and wraps
+              // freely. Only one of the two is ever displayed.
+              <>
+                <ScrubText
+                  as="span"
+                  start="top 85%"
+                  end="top 55%"
+                  className="block lg:hidden"
+                >
+                  {lines.join(" ")}
+                </ScrubText>
+                <span className="hidden lg:block">
+                  {lines.map((line) => (
+                    <ScrubText
+                      key={line}
+                      as="span"
+                      start="top 85%"
+                      end="top 55%"
+                      className="block"
+                    >
+                      {line}
+                    </ScrubText>
+                  ))}
+                </span>
+              </>
+            )}
           </h2>
         </div>
 

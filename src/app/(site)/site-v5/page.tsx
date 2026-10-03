@@ -20,6 +20,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
+  // An archived alternative version; kept out of search.
+  robots: { index: false, follow: false },
 };
 
 /**

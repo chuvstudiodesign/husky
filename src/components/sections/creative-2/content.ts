@@ -45,11 +45,26 @@ export const HERO = {
     external: true,
   } satisfies Cta,
   secondaryCta: { label: "See What We Do", href: "#services" } satisfies Cta,
+  // Both on trial (client, 2026-10-03). The original was
+  // `/photos/estate-dusk-01.jpg`, 2132 × 738, focusX 0.66.
+  /** Seen through the mark, and the full frame the zoom opens onto. */
   image: {
-    src: "/photos/estate-dusk-01.jpg",
+    // `/photos/estate-garden-dusk.png` is the first take of this same view.
+    src: "/photos/estate-garden-dusk-02.png",
     /** Intrinsic size of the file. */
-    width: 2132,
-    height: 738,
+    width: 2105,
+    height: 1000,
+    /** How far across the photo its subject sits (the lit house). The phone
+     *  centres the mark on it. */
+    focusX: 0.46,
+  },
+  /** What the frame cross-fades to once the zoom has finished, just before
+   *  the hand-off to Stats. */
+  imageEnd: {
+    src: "/photos/estate-aerial-dusk.png",
+    width: 2004,
+    height: 999,
+    focusX: 0.51,
   },
 } as const;
 

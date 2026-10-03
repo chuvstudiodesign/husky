@@ -3,7 +3,7 @@
 import { useEffect, useRef, type ReactNode } from "react";
 
 import { CableSegment } from "@/components/motion-ui/cable-segment";
-import { SCRUB, gsap } from "@/components/motion-ui/gsap-setup";
+import { SCRUB, gsap, registerGsap } from "@/components/motion-ui/gsap-setup";
 import {
   MARK_BOX,
   MARK_CHIN,
@@ -12,8 +12,6 @@ import {
 } from "@/components/motion-ui/husky-mark-paths";
 import { useScrollScene } from "@/components/motion-ui/use-scroll-scene";
 import { HERO } from "@/components/sections/creative-2/content";
-
-const HERO_PHOTO = HERO.image;
 
 /**
  * Where the zoom is anchored: the largest solid block of the mark, the chin
@@ -33,15 +31,19 @@ const CHIN_FROM_CENTRE =
   (MARK_CHIN.y - (MARK_BOX.y + MARK_BOX.height / 2)) / MARK_BOX.height;
 
 /**
- * Phone photo framing. The photo fills the stage's height at its own 2.89:1 and
- * is slid so that its point 0.66 across, the lit façade, sits on the stage's
- * centre line, which is where the mark is.
+ * Phone photo framing. The photo fills the stage's height at its own ratio and
+ * is slid so that its subject (`focusX`) sits on the stage's centre line, which
+ * is where the mark is.
  */
-const PHOTO_PHONE: React.CSSProperties = {
-  aspectRatio: `${HERO_PHOTO.width} / ${HERO_PHOTO.height}`,
+const phonePlate = (photo: {
+  width: number;
+  height: number;
+  focusX: number;
+}): React.CSSProperties => ({
+  aspectRatio: `${photo.width} / ${photo.height}`,
   left: "50%",
-  transform: "translateX(-66%)",
-};
+  transform: `translateX(${-photo.focusX * 100}%)`,
+});
 
 /**
  * The veil: one dark sheet with the mark cut out of it (even-odd), reaching
@@ -130,8 +132,7 @@ function measureZoom(
 const SCENE_CSS = `
 .c2-hero-frame { --c2-g: clamp(1.5rem, 5vw, 4rem); }
 .c2-hero-mark { width: 80vw; }
-/* 1px hairline in viewBox units (308 units across the window). Not
-   non-scaling-stroke: that breaks the pathLength-based draw. */
+/* 1px hairline in viewBox units (308 units across the window). */
 .c2-hero-outline path { stroke-width: calc(${MARK_BOX.width} / 312); }
 @media (min-width: 48rem) {
   .c2-hero-frame {
@@ -160,13 +161,23 @@ const SCENE_CSS = `
     overflow: clip;
   }
 }
-.c2-hero-outline path { stroke-dasharray: 1; stroke-opacity: 0.24; }
+.c2-hero-outline path { stroke-opacity: 0.24; }
 @media (prefers-reduced-motion: no-preference) {
-  [data-intro="pending"] .c2-hero-outline path { stroke-dashoffset: 1; }
+  [data-intro="pending"] .c2-hero-outline { visibility: hidden; }
   [data-intro="pending"] [data-hero-photo] { opacity: 0; }
   [data-intro="pending"] [data-hero-connector] { transform: scale(0); }
 }
 `;
+
+/**
+ * The intro's clock, in seconds (client, 2026-10-03: unhurried, about five
+ * seconds, the line and the photograph arriving together). The line takes the
+ * first 3.6 (3.2 plus the jaw's 0.4 stagger); the house comes up under it from
+ * 0.8 to the end.
+ */
+const INTRO_TOTAL = 5;
+const INTRO_DRAW = 3.2;
+const INTRO_FILL = 4.2;
 
 /** If the photo or fonts stall, the intro plays anyway after this long. */
 const INTRO_TIMEOUT = 2500;
@@ -179,22 +190,33 @@ export interface HeroSceneProps {
   photo: ReactNode;
   /** The same photo for the phone window. */
   photoPhone: ReactNode;
+  /** The closing photo the frame cross-fades to after the zoom (desktop). */
+  photoEnd: ReactNode;
+  /** The closing photo, for the phone. */
+  photoEndPhone: ReactNode;
 }
 
 /**
  * The hero's client scene: the pinned 100svh frame, the mark cut out of a dark
  * veil over a still photograph, and the cable's first segment.
  *
- * Intro (once per load): the outline draws itself bright, then settles to a
- * hairline while the house fades up inside the mark, then the cable drops
- * from the chin. It waits for the fonts, the photo's decode and the scroll
+ * Intro (once per load, five seconds): the outline draws itself bright, as
+ * About's mark does, while the house fades up inside it; the line then settles
+ * to a hairline and the cable drops from the chin. It waits for the fonts, the photo's decode and the scroll
  * scene's pin, so nothing restarts it or plays it unseen behind hydration.
  *
  * Scroll: the veil scales about the chin, so the mark-shaped hole grows over
- * the still house until it is the whole frame. On desktop the frame is pinned
+ * the still house until it is the whole frame; the frame then cross-fades to
+ * the closing photo before it hands off to Stats. On desktop the frame is pinned
  * for it; on the phone the mark's stage sticks instead (see SCENE_CSS).
  */
-export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
+export function HeroScene({
+  children,
+  photo,
+  photoPhone,
+  photoEnd,
+  photoEndPhone,
+}: HeroSceneProps) {
   const frameRef = useRef<HTMLDivElement>(null);
 
   // --- Intro -------------------------------------------------------------
@@ -219,13 +241,15 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
 
     const play = () => {
       if (cancelled || intro) return;
+      // DrawSVG, whichever of this effect and the scroll scene runs first.
+      registerGsap();
       const paths = q(".c2-hero-outline path");
       const photos = q("[data-hero-photo]");
       const connectors = q("[data-hero-connector]");
 
       // Take over the CSS "before" state with inline styles, then let the
       // stylesheet go. Inline styles survive the pin moving the frame.
-      gsap.set(paths, { strokeDashoffset: 1 });
+      gsap.set(paths, { drawSVG: "0%" });
       gsap.set(photos, { opacity: 0 });
       gsap.set(connectors, { scale: 0 });
       // Drawn bright, so the line reads; it settles to the hairline after.
@@ -236,30 +260,37 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
         .timeline({
           onComplete: () => {
             gsap.set([...paths, ...photos, ...connectors], {
-              clearProps: "strokeDashoffset,strokeOpacity,opacity,transform",
+              clearProps:
+                "strokeDasharray,strokeDashoffset,strokeOpacity,opacity,transform",
             });
           },
         })
-        // The line: head first, then the jaw, one continuous stroke of the pen.
+        // The line, the way About's mark draws: head first, then the jaw, one
+        // slow stroke of the pen.
         .to(paths, {
-          strokeDashoffset: 0,
-          duration: 1.8,
-          ease: "power2.inOut",
-          stagger: 0.35,
+          drawSVG: "100%",
+          duration: INTRO_DRAW,
+          ease: "power1.inOut",
+          stagger: 0.4,
         })
-        // The house comes up inside the finished line…
-        .to(photos, { opacity: 1, duration: 1.1, ease: "power1.out" }, "-=0.5")
-        // …as the line settles back to its hairline.
+        // The house fills the mark under the line while it is still drawing,
+        // and the two finish together.
+        .to(
+          photos,
+          { opacity: 1, duration: INTRO_FILL, ease: "power1.inOut" },
+          INTRO_TOTAL - INTRO_FILL,
+        )
+        // The finished line settles back to its hairline.
         .to(
           paths,
-          { strokeOpacity: 0.24, duration: 1.1, ease: "power1.out" },
-          "<",
+          { strokeOpacity: 0.24, duration: 1.2, ease: "power1.out" },
+          INTRO_TOTAL - 1.2,
         )
         // The cable leaves the chin: down, then out to the gutter.
         .to(
           connectors[0] ?? [],
           { scale: 1, duration: 0.3, ease: "power2.out" },
-          "-=0.7",
+          INTRO_TOTAL - 0.7,
         )
         .to(
           connectors[1] ?? [],
@@ -370,8 +401,15 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
           },
           0,
         )
-        // 0.70 → 1.00  dim for the hand-off to the light Stats band
-        .fromTo(dim, { opacity: 0 }, { opacity: 0.55, duration: 0.3 }, 0.7);
+        // 0.66 → 0.86  the open frame cross-fades to the closing photo
+        .fromTo(
+          q("[data-hero-photo-end]"),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.2 },
+          0.66,
+        )
+        // 0.90 → 1.00  dim for the hand-off to the light Stats band
+        .fromTo(dim, { opacity: 0 }, { opacity: 0.55, duration: 0.1 }, 0.9);
 
       // Pointer: the house drifts ±12px against the cursor, a look through a
       // window. Only the photo layer moves; the mark stays put.
@@ -464,8 +502,15 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
           },
           0,
         )
-        // 0.80 → 1.00  dim for the hand-off to the light Stats band
-        .fromTo(dim, { opacity: 0 }, { opacity: 0.55, duration: 0.2 }, 0.8);
+        // 0.72 → 0.90  the open screen cross-fades to the closing photo
+        .fromTo(
+          q("[data-hero-photo-end]"),
+          { opacity: 0 },
+          { opacity: 1, duration: 0.18 },
+          0.72,
+        )
+        // 0.92 → 1.00  dim for the hand-off to the light Stats band
+        .fromTo(dim, { opacity: 0 }, { opacity: 0.55, duration: 0.08 }, 0.92);
       return () => zoom.removeAttribute("transform");
     },
   });
@@ -479,7 +524,7 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
       <style>{SCENE_CSS}</style>
       {/* Without JS there is no intro to play: show the finished hero. */}
       <noscript>
-        <style>{`[data-intro="pending"] .c2-hero-outline path { stroke-dashoffset: 0 !important; } [data-intro="pending"] [data-hero-photo] { opacity: 1 !important; } [data-intro="pending"] [data-hero-connector] { transform: none !important; }`}</style>
+        <style>{`[data-intro="pending"] .c2-hero-outline { visibility: visible !important; } [data-intro="pending"] [data-hero-photo] { opacity: 1 !important; } [data-intro="pending"] [data-hero-connector] { transform: none !important; }`}</style>
       </noscript>
 
       {/* The house (desktop): full-bleed and still, behind the veil. */}
@@ -490,6 +535,10 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
         <div data-hero-photo="" className="absolute inset-0">
           <div data-hero-photo-move="" className="absolute -inset-4">
             {photo}
+            {/* The closing photo, over the first; the scroll fades it in. */}
+            <div data-hero-photo-end="" className="absolute inset-0 opacity-0">
+              {photoEnd}
+            </div>
           </div>
         </div>
         <div
@@ -518,8 +567,15 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
             data-hero-photo=""
             className="absolute inset-0 md:hidden"
           >
-            <div className="absolute inset-y-0" style={PHOTO_PHONE}>
+            <div className="absolute inset-y-0" style={phonePlate(HERO.image)}>
               {photoPhone}
+            </div>
+            <div
+              data-hero-photo-end=""
+              className="absolute inset-y-0 opacity-0"
+              style={phonePlate(HERO.imageEnd)}
+            >
+              {photoEndPhone}
             </div>
             <div
               data-hero-dim-phone=""
@@ -549,7 +605,7 @@ export function HeroScene({ children, photo, photoPhone }: HeroSceneProps) {
                   fill="none"
                 >
                   {MARK_PATHS.map((d) => (
-                    <path key={d} d={d} pathLength={1} stroke="currentColor" />
+                    <path key={d} d={d} stroke="currentColor" />
                   ))}
                 </g>
               </g>

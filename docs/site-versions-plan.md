@@ -31,6 +31,23 @@ These hold for every version. Breaking one is a bug, not a variation.
 The original brief numbered these 2–5. Site 1 was promoted to the main page at `/`,
 so everything shifted down one:
 
+> **Routes renamed 2026-10-03.** Creative 2 was promoted to the official site, and
+> every other version was archived under one naming scheme, all `noindex`. Route
+> names below this note (and in older code comments) are the old ones.
+>
+> | Now | Was | What it is |
+> |---|---|---|
+> | `/` | `/creative-2` | **The official home** |
+> | `/new-construction` | `/creative-2/new-construction` | **The official New Construction page** |
+> | `/site-v2` | `/` | The previous main site |
+> | `/site-v3` | `/v2` (planned as `/site-1`) | Main site's layout, heavily animated |
+> | `/site-v4` | `/site-2` | Editorial / index layout |
+> | `/site-v5` | `/site-3` | Horizontal / control panel |
+> | `/site-v6` | `/site-4` | Photo-led hero |
+> | `/site-v7` | `/creative-1` | Creative 1 |
+> | `/new-construction-v2` | `/new-construction` | The previous New Construction page |
+> | `/new-construction-v3` | `/new-construction-2` | Its second pass |
+
 | Route | Was called | What it is |
 |---|---|---|
 | `/` | — | **The approved main site. Do not modify.** |

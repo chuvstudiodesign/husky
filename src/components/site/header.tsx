@@ -12,39 +12,23 @@ import { HuskyWordmark } from "@/components/motion-ui/husky-wordmark";
 
 const WHATSAPP = "https://api.whatsapp.com/send?phone=19548648005";
 
-/**
- * The nav belongs to whichever home the visitor is on. `/creative-2` is a whole
- * alternative site with its own New Construction page, so from anywhere under
- * it the links stay inside it; everywhere else they point at `/`.
- */
-const HOMES = [
-  {
-    home: "/creative-2",
-    top: "#home",
-    newConstruction: "/creative-2/new-construction",
-  },
-  { home: "/", top: "#start", newConstruction: "/new-construction" },
-] as const;
+const HOME = "/";
+
+/** Routes whose first viewport is the orange surface. */
+const ORANGE_HEROES = ["/new-construction"];
 
 function linksFor(pathname: string) {
-  const { home, top, newConstruction } =
-    HOMES.find(
-      (h) => pathname === h.home || pathname.startsWith(`${h.home}/`),
-    ) ?? HOMES[HOMES.length - 1];
   // On the home itself the section links are bare hashes: a same-page anchor,
   // which SmoothScroll eases to. From any other page they carry the route.
-  const at = pathname === home ? "" : home;
-  return {
-    home,
-    links: [
-      // The top of the home when already on it, the route from anywhere else.
-      { label: "Home", href: pathname === home ? top : home },
-      { label: "Services", href: `${at}#services` },
-      { label: "Approach", href: `${at}#approach` },
-      { label: "About", href: `${at}#about` },
-      { label: "New Construction", href: newConstruction },
-    ],
-  };
+  const at = pathname === HOME ? "" : HOME;
+  return [
+    // The top of the home when already on it, the route from anywhere else.
+    { label: "Home", href: pathname === HOME ? "#home" : HOME },
+    { label: "Services", href: `${at}#services` },
+    { label: "Approach", href: `${at}#approach` },
+    { label: "About", href: `${at}#about` },
+    { label: "New Construction", href: "/new-construction" },
+  ];
 }
 
 /**
@@ -63,7 +47,8 @@ function NavLink({
 }
 
 export function Header() {
-  const { home, links } = linksFor(usePathname());
+  const pathname = usePathname();
+  const links = linksFor(pathname);
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const toggleRef = useRef<HTMLButtonElement>(null);
@@ -95,6 +80,11 @@ export function Header() {
       toggle?.focus();
     };
   }, [open]);
+
+  // The bar at rest over an orange hero: everything in it goes brand black,
+  // the mark included (its file is the orange one, which would vanish). Once
+  // scrolled the dark scrim is behind it and the usual colours hold again.
+  const onOrange = ORANGE_HEROES.includes(pathname) && !scrolled;
 
   return (
     <header
@@ -141,7 +131,7 @@ export function Header() {
             the extra 14px is transparent, and the row is `items-center` so the
             logo stays where it was. */}
         <Link
-          href={home}
+          href={HOME}
           className="flex h-11 items-center gap-3"
           aria-label="Husky Audio Video, home"
         >
@@ -157,9 +147,11 @@ export function Header() {
             alt=""
             width={25}
             height={30}
-            className="h-[30px] w-auto"
+            className={cn("h-[30px] w-auto", onOrange && "brightness-0")}
           />
-          <HuskyWordmark className="h-3.5 w-auto" />
+          <HuskyWordmark
+            className={cn("h-3.5 w-auto", onOrange && "text-brand-black")}
+          />
         </Link>
 
         {/* Uppercase, on the client's call (2026-09-01), and scoped to this row
@@ -177,7 +169,12 @@ export function Header() {
             <NavLink
               key={l.label}
               href={l.href}
-              className="nav-text text-muted-foreground hover:text-foreground uppercase tracking-[0.08em] transition-colors"
+              className={cn(
+                "nav-text uppercase tracking-[0.08em] transition-colors",
+                onOrange
+                  ? "text-brand-black hover:text-brand-black/72"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
               {l.label}
             </NavLink>
@@ -193,7 +190,11 @@ export function Header() {
           <Button
             asChild
             variant={scrolled ? "default" : "outline"}
-            className="hidden sm:inline-flex"
+            className={cn(
+              "hidden sm:inline-flex",
+              onOrange &&
+                "border-brand-black text-brand-black hover:bg-brand-black/10 hover:text-brand-black dark:border-brand-black dark:hover:bg-brand-black/10",
+            )}
           >
             <a href={WHATSAPP} target="_blank" rel="noopener noreferrer">
               Talk to Us
@@ -208,7 +209,12 @@ export function Header() {
                either side is a 40px tap target — under the 44px the design
                system holds every standalone control to. A fixed 44px box with
                the icon centred hits the standard and keeps the row height. */
-            className="hover:bg-muted -mr-2 flex size-11 items-center justify-center rounded-lg lg:hidden"
+            className={cn(
+              "-mr-2 flex size-11 items-center justify-center rounded-lg lg:hidden",
+              onOrange
+                ? "text-brand-black hover:bg-brand-black/10"
+                : "hover:bg-muted",
+            )}
             aria-label={open ? "Close menu" : "Open menu"}
             aria-expanded={open}
           >

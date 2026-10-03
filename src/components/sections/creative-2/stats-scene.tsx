@@ -3,7 +3,12 @@
 import { useRef, useSyncExternalStore } from "react";
 
 import { CableSegment } from "@/components/motion-ui/cable-segment";
-import { MQ, SCRUB, gsap } from "@/components/motion-ui/gsap-setup";
+import {
+  MQ,
+  SCRUB,
+  ScrollTrigger,
+  gsap,
+} from "@/components/motion-ui/gsap-setup";
 import { ScrubOdometer } from "@/components/motion-ui/scrub-odometer";
 import { addScrubText } from "@/components/motion-ui/scrub-text";
 import { useScrollScene } from "@/components/motion-ui/use-scroll-scene";
@@ -25,6 +30,9 @@ const TICK = 0.03 * UNIT;
 /** A figure fades up over the first part of its window, as its roll begins, so
  *  no column ever shows a row of zero placeholders ahead of the head. */
 const REVEAL = WINDOW * 0.3;
+
+/** Phone: scroll px per px of the row's sideways travel, as in Services. */
+const STICK_FACTOR = 0.8;
 
 const VISIBLE = "inset(0% 0% 0% 0%)";
 const HIDDEN_RIGHT = "inset(0% 100% 0% 0%)";
@@ -125,7 +133,8 @@ export interface StatsSceneProps {
 /**
  * The readout. Desktop (motion): the frame pins for 100vh while the measure line
  * draws left to right and each column reads out in its 0.20 window. Phone
- * (motion): no pin; each cell draws its own rule, figure and label on entry.
+ * (motion): the same row, one figure wide; the stage sticks while the row is
+ * scrubbed sideways and each cell draws its rule, figure and label as it arrives.
  * Reduced motion: no scene is built and the server render — final figures, fully
  * drawn line — is the layout.
  */
@@ -176,7 +185,9 @@ export function StatsScene({ items }: StatsSceneProps) {
         const tick = col.querySelector("[data-stats-tick]");
         const wipe = col.querySelector('[data-fig="lg"] [data-stat-wipe]');
         const odo = col.querySelector('[data-fig="lg"] [data-scrub-odometer]');
-        const suffix = odo?.querySelector(":scope > [aria-hidden] > :last-child:not(.relative)");
+        const suffix = odo?.querySelector(
+          ":scope > [aria-hidden] > :last-child:not(.relative)",
+        );
         const label = col.querySelector<HTMLElement>("[data-stats-label]");
 
         if (tick) {
@@ -193,7 +204,12 @@ export function StatsScene({ items }: StatsSceneProps) {
         if (odo) {
           // Hidden (autoAlpha 0, rendered immediately) until the head reaches
           // this column, then revealed as it rolls.
-          tl.fromTo(odo, { autoAlpha: 0 }, { autoAlpha: 1, duration: REVEAL }, at);
+          tl.fromTo(
+            odo,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: REVEAL },
+            at,
+          );
           addFigureRoll(tl, odo, at, WINDOW);
         }
         if (suffix) {
@@ -205,7 +221,8 @@ export function StatsScene({ items }: StatsSceneProps) {
             at + WINDOW * 0.8,
           );
         }
-        if (label) addScrubText(tl, label, { split: "chars", effect: "spread" }, at);
+        if (label)
+          addScrubText(tl, label, { split: "chars", effect: "spread" }, at);
       });
 
       // Hold: nothing moves for the last 20%, so the readout can be read.
@@ -216,7 +233,9 @@ export function StatsScene({ items }: StatsSceneProps) {
       const offs = cols.map((col) => {
         const onEnter = () => {
           if (tl.progress() < 0.8) return;
-          const odo = col.querySelector('[data-fig="lg"] [data-scrub-odometer]');
+          const odo = col.querySelector(
+            '[data-fig="lg"] [data-scrub-odometer]',
+          );
           const wipe = col.querySelector('[data-fig="lg"] [data-stat-wipe]');
           if (odo) playFigureRoll(odo);
           if (wipe) {
@@ -243,28 +262,63 @@ export function StatsScene({ items }: StatsSceneProps) {
     },
 
     mobile: ({ scope }) => {
+      const stage = scope.querySelector<HTMLElement>("[data-stats-stage]");
+      const track = scope.querySelector<HTMLElement>("[data-stats-track]");
       const cells = Array.from(
         scope.querySelectorAll<HTMLElement>("[data-stats-col]"),
       );
+      if (!stage || !track) return;
+
+      // The same row the desktop reads, on a screen one figure wide: the frame
+      // is made tall, its stage sticks, and the row is scrubbed sideways under
+      // one continuous rule. Sticky, not a pin, as in Services.
+      scope.dataset.mode = "track";
+      const distance = () =>
+        Math.max(
+          0,
+          track.offsetWidth + 2 * track.offsetLeft - window.innerWidth,
+        );
+      const size = () => {
+        scope.style.height = `${stage.offsetHeight + distance() * STICK_FACTOR}px`;
+      };
+      size();
+      ScrollTrigger.addEventListener("refreshInit", size);
+
+      const main = gsap.to(track, {
+        x: () => -distance(),
+        ease: "none",
+        scrollTrigger: {
+          trigger: scope,
+          start: "top top",
+          end: () => "+=" + distance() * STICK_FACTOR,
+          scrub: SCRUB,
+          invalidateOnRefresh: true,
+        },
+      });
+
       cells.forEach((cell) => {
-        // Motion contract: nothing in the first viewport is hidden for JS.
-        if (cell.getBoundingClientRect().top + window.scrollY < window.innerHeight) {
-          return;
-        }
         const rule = cell.querySelector("[data-stats-rule]");
         const wipe = cell.querySelector('[data-fig="sm"] [data-stat-wipe]');
         const odo = cell.querySelector('[data-fig="sm"] [data-scrub-odometer]');
-        const suffix = odo?.querySelector(":scope > [aria-hidden] > :last-child:not(.relative)");
+        const suffix = odo?.querySelector(
+          ":scope > [aria-hidden] > :last-child:not(.relative)",
+        );
         const label = cell.querySelector<HTMLElement>("[data-stats-label]");
 
+        // A cell already on screen when the band arrives reads out as the band
+        // rises into view; the rest read out as the row brings them in.
+        const onScreen = cell.offsetLeft < window.innerWidth * 0.85;
         const tl = gsap.timeline({
           defaults: { ease: "none" },
-          scrollTrigger: {
-            trigger: cell,
-            start: "top 85%",
-            end: "top 45%",
-            scrub: SCRUB,
-          },
+          scrollTrigger: onScreen
+            ? { trigger: scope, start: "top 70%", end: "top 15%", scrub: SCRUB }
+            : {
+                trigger: cell,
+                containerAnimation: main,
+                start: "left 90%",
+                end: "left 35%",
+                scrub: SCRUB,
+              },
         });
         if (rule) {
           tl.fromTo(
@@ -283,7 +337,12 @@ export function StatsScene({ items }: StatsSceneProps) {
           );
         }
         if (odo) {
-          tl.fromTo(odo, { autoAlpha: 0 }, { autoAlpha: 1, duration: REVEAL }, 0);
+          tl.fromTo(
+            odo,
+            { autoAlpha: 0 },
+            { autoAlpha: 1, duration: REVEAL },
+            0,
+          );
           addFigureRoll(tl, odo, 0, WINDOW);
         }
         if (suffix) {
@@ -294,22 +353,34 @@ export function StatsScene({ items }: StatsSceneProps) {
             WINDOW * 0.8,
           );
         }
-        if (label) addScrubText(tl, label, { split: "chars", effect: "spread" }, 0);
+        if (label)
+          addScrubText(tl, label, { split: "chars", effect: "spread" }, 0);
       });
+
+      return () => {
+        ScrollTrigger.removeEventListener("refreshInit", size);
+        scope.style.height = "";
+        delete scope.dataset.mode;
+      };
     },
   });
 
   return (
     <div
       ref={frameRef}
-      className="group/stats section-x section-y relative md:h-svh md:py-0"
+      className="group/stats section-x section-y relative max-md:data-[mode=track]:py-0 md:h-svh md:py-0"
     >
       <CableSegment
         tone="light"
         pinTrigger={motionDesktop ? frameRef : undefined}
       />
 
-      <div className="relative h-full">
+      {/* On the phone, in track mode, this is the sticky screen; it reaches
+          into both gutters so the row is clipped at the screen's edge. */}
+      <div
+        data-stats-stage=""
+        className="relative h-full max-md:in-data-[mode=track]:sticky max-md:in-data-[mode=track]:top-0 max-md:in-data-[mode=track]:-mx-6 max-md:in-data-[mode=track]:flex max-md:in-data-[mode=track]:h-svh max-md:in-data-[mode=track]:items-center max-md:in-data-[mode=track]:overflow-clip max-md:in-data-[mode=track]:px-6"
+      >
         {/* Measure line (desktop): a navy-900/24 track, a /48 fill and, while a
             motion branch runs, the orange draw head riding the fill's end. */}
         <div
@@ -328,13 +399,18 @@ export function StatsScene({ items }: StatsSceneProps) {
           />
         </div>
 
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-12 md:h-full md:grid-cols-[repeat(4,1fr)] md:grid-rows-2 md:gap-x-8 md:gap-y-0">
+        <dl
+          data-stats-track=""
+          className="grid grid-cols-2 gap-x-6 gap-y-12 max-md:in-data-[mode=track]:flex max-md:in-data-[mode=track]:w-max max-md:in-data-[mode=track]:items-end max-md:in-data-[mode=track]:gap-0 md:h-full md:grid-cols-[repeat(4,1fr)] md:grid-rows-2 md:gap-x-8 md:gap-y-0"
+        >
           {items.map((s, i) => (
             <div
               key={s.label}
               data-stats-col=""
               className={cn(
-                "group/col relative flex flex-col md:row-span-2 md:grid md:grid-rows-subgrid",
+                // Track mode on the phone: 64vw, no gap, so the per-cell rules
+                // butt into one line and the next figure shows at the edge.
+                "group/col relative flex flex-col max-md:in-data-[mode=track]:w-[64vw] max-md:in-data-[mode=track]:shrink-0 md:row-span-2 md:grid md:grid-rows-subgrid",
                 i === 0 && "col-span-2 md:col-span-1",
               )}
             >
@@ -368,7 +444,9 @@ export function StatsScene({ items }: StatsSceneProps) {
                     data-fig={size}
                     className={cn(
                       "block",
-                      size === "sm" ? "display-1 md:hidden" : "display-1 hidden md:block",
+                      size === "sm"
+                        ? "display-1 md:hidden"
+                        : "display-1 hidden md:block",
                     )}
                   >
                     {s.numeric ? (

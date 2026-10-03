@@ -1,49 +1,37 @@
 import type { Metadata } from "next";
 
-import { HalfMark } from "@/components/motion-ui/half-mark-v3";
-import { Hero } from "@/components/sections/v4/hero";
-import { Stats } from "@/components/sections/v4/stats";
-import { Services } from "@/components/sections/v4/services";
-import { Approach } from "@/components/sections/v4/approach";
-import { Partners } from "@/components/sections/v4/partners";
-import { Showcase } from "@/components/sections/v4/showcase";
-import { About } from "@/components/sections/v4/about";
-import { Contact } from "@/components/sections/v4/contact";
+import { ScrollSceneRoot } from "@/components/motion-ui/scroll-scene-root";
+import { META } from "@/components/sections/creative-2/content";
+import { Hero } from "@/components/sections/creative-2/hero";
+import { Stats } from "@/components/sections/creative-2/stats";
+import { Services } from "@/components/sections/creative-2/services";
+import { Approach } from "@/components/sections/creative-2/approach";
+import { Partners } from "@/components/sections/creative-2/partners";
+import { Showcase } from "@/components/sections/creative-2/showcase";
+import { About } from "@/components/sections/creative-2/about";
+import { Contact } from "@/components/sections/creative-2/contact";
 
 export const metadata: Metadata = {
-  title: "Husky Audio Video, Luxury Smart Home Automation in South Florida",
-  description:
-    "Custom smart home automation, home cinema, lighting, surveillance and networking for high-end homes across South Florida. Over 20 years of custom integration experience.",
+  title: META.title,
+  description: META.description,
   openGraph: {
-    title: "Husky Audio Video, Luxury Smart Home Automation",
-    description:
-      "Custom smart home automation, home cinema, lighting, surveillance and networking for high-end homes across South Florida.",
+    title: META.ogTitle,
+    description: META.ogDescription,
     locale: "en_US",
     type: "website",
   },
 };
 
 /**
- * Site 1 — the animated variant.
- *
- * Same structure and visual language as the main site; what changes is how much of
- * it moves. Held to one device per section so the page reads as composed rather
- * than as a demo reel:
- *
- *   Hero      FoldText on the accent line
- *   Stats     service area leads, then tenure
- *   Approach  the one scroll-linked passage, lit word by word
- *   Showcase  the page's single photograph, unmasked and drifting
- *
- * Momentum scrolling now comes from the shared site layout rather than from here,
- * so every route gets it.
+ * The home page. This is "Creative 2 — Low Voltage", promoted to `/` on the
+ * client's call (2026-10-03); its sections still live under
+ * `components/sections/creative-2`. The earlier versions are archived at
+ * `/site-v2` … `/site-v7`, out of the index.
+ * Direction: `docs/creative-versions.md`.
  */
 export default function HomePage() {
   return (
-    <div className="relative">
-      {/* On phones the resting mark drops 30% of its own height below centre, so it
-          clears the headline. Desktop and the docked badge are unaffected. */}
-      <HalfMark mobileDrop={30} />
+    <ScrollSceneRoot>
       <Hero />
       <Stats />
       <Services />
@@ -52,6 +40,6 @@ export default function HomePage() {
       <Showcase />
       <About />
       <Contact />
-    </div>
+    </ScrollSceneRoot>
   );
 }

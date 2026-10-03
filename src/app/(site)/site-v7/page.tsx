@@ -20,8 +20,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "website",
   },
-  // An alternative presentation of `/`; keep it out of the index.
-  robots: { index: false },
+  // An archived alternative version; kept out of search.
+  robots: { index: false, follow: false },
 };
 
 /**

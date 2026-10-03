@@ -7,11 +7,30 @@ import { HERO } from "@/components/sections/creative-2/content";
 import { HeroScene } from "@/components/sections/creative-2/hero-scene";
 
 /**
- * The photo covers a full-height frame, and it is 2.89:1, so on anything
- * narrower than that it is laid out by height: 289vh wide, not 100vw. Telling
- * the browser 100vw had it pick a file for a third of the pixels drawn.
+ * The photo covers a full-height frame, so on any screen narrower than the
+ * photo it is laid out by height and is wider than the screen. Telling the
+ * browser 100vw had it pick a file for a fraction of the pixels drawn.
  */
-const PHOTO_SIZES = "(min-aspect-ratio: 289/100) 100vw, 289vh";
+const sizesFor = (photo: { width: number; height: number }) => {
+  const ratio = Math.round((photo.width / photo.height) * 100);
+  return `(min-aspect-ratio: ${ratio}/100) 100vw, ${ratio}vh`;
+};
+
+/** The closing photo, for either placement. Eager, so it has decoded long
+ *  before the scroll reaches the cross-fade; not preloaded, it is not the LCP. */
+function endPhoto(className: string) {
+  const { props } = getImageProps({
+    src: HERO.imageEnd.src,
+    alt: "",
+    width: HERO.imageEnd.width,
+    height: HERO.imageEnd.height,
+    sizes: sizesFor(HERO.imageEnd),
+    quality: 90,
+    loading: "eager",
+  });
+  // eslint-disable-next-line @next/next/no-img-element, jsx-a11y/alt-text -- getImageProps output
+  return <img {...props} className={className} />;
+}
 
 /**
  * Creative 2 — Hero. A still dusk house behind a dark veil, seen through the
@@ -36,10 +55,10 @@ export function Hero() {
       height={HERO.image.height}
       preload
       fetchPriority="high"
-      sizes={PHOTO_SIZES}
+      sizes={sizesFor(HERO.image)}
       quality={90}
       data-scroll-scene-hero=""
-      className="size-full object-cover object-[58%_55%]"
+      className="size-full object-cover object-left"
     />
   );
   const { props: phone } = getImageProps({
@@ -47,7 +66,7 @@ export function Hero() {
     alt: "",
     width: HERO.image.width,
     height: HERO.image.height,
-    sizes: PHOTO_SIZES,
+    sizes: sizesFor(HERO.image),
     quality: 90,
   });
   const photoPhone = (
@@ -61,7 +80,12 @@ export function Hero() {
       aria-labelledby="home-title"
       className="bg-background @container relative"
     >
-      <HeroScene photo={photo} photoPhone={photoPhone}>
+      <HeroScene
+        photo={photo}
+        photoPhone={photoPhone}
+        photoEnd={endPhoto("size-full object-cover")}
+        photoEndPhone={endPhoto("size-full")}
+      >
         <p
           data-hero="fade"
           className="eyebrow text-muted-foreground group-data-[powered]:text-foreground transition-colors duration-250 ease-[cubic-bezier(0.16,1,0.3,1)]"

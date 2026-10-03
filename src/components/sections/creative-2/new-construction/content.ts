@@ -18,7 +18,7 @@ import {
 } from "@/components/sections/creative-2/content";
 
 /** The Creative 2 home. Every link back to the home page targets it, never `/`. */
-export const HOME = "/creative-2";
+export const HOME = "/";
 
 export interface Paragraph {
   text: string;
@@ -29,6 +29,8 @@ export interface PassageCopy {
   /** Section id, and the stem of its heading id. */
   id: string;
   eyebrow: string;
+  /** A `\n` is an authored line break, honoured from `lg` up only; below it
+   *  the heading wraps on its own (see `passage.tsx`). */
   h2: string;
   body: readonly Paragraph[];
 }
@@ -65,7 +67,7 @@ export const HERO = {
 export const PLAN = {
   id: "plan",
   eyebrow: "PLAN BEFORE YOU BUILD",
-  h2: "Plan the technology before you start building.",
+  h2: "Plan the technology before\nyou start building.",
   body: [
     {
       text: "If you're building a new home in South Florida, don't wait until construction is underway to think about technology.",
@@ -172,7 +174,7 @@ export const INVISIBLE = {
 export const FLORIDA = {
   id: "florida",
   eyebrow: "FLORIDA SPECIFICS",
-  h2: "Florida homes ask more of the equipment.",
+  h2: "Florida homes ask more\nof the equipment.",
   body: [
     {
       text: "Heat, humidity, salt air and storm season are not edge cases here, they're the operating conditions.",

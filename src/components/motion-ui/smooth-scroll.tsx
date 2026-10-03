@@ -14,6 +14,17 @@ declare global {
 /** Fired on `window` once Lenis is running and published on `window.__lenis`. */
 export const LENIS_READY_EVENT = "lenis:ready";
 
+/**
+ * What to scroll to for an anchor. A section ScrollTrigger has pinned sits in a
+ * `.pin-spacer`, and once the pin has run it rests at the spacer's foot, so
+ * from below the section itself measures as the end of its own scene. The
+ * spacer's top is where the scene starts.
+ */
+export function anchorTarget(el: HTMLElement): HTMLElement {
+  const parent = el.parentElement;
+  return parent?.classList.contains("pin-spacer") ? parent : el;
+}
+
 export interface SmoothScrollProps {
   /** How long the wheel's momentum takes to settle, in seconds. */
   duration?: number;
@@ -84,7 +95,7 @@ export function SmoothScroll({
       // No offset here: `section[id] { scroll-margin-top: 5rem }` in globals.css
       // already clears the fixed header, and Lenis honours scroll-margin. Adding
       // one on top of the other landed every anchor 80px too low.
-      lenis.scrollTo(target as HTMLElement);
+      lenis.scrollTo(anchorTarget(target as HTMLElement));
     };
 
     document.addEventListener("click", onClick);

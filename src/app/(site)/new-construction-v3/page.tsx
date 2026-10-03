@@ -60,6 +60,8 @@ export const metadata: Metadata = {
     locale: "en_US",
     type: "article",
   },
+  // An archived alternative version; kept out of search.
+  robots: { index: false, follow: false },
 };
 
 const rooms = [
