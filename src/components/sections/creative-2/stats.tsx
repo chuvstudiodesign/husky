@@ -16,7 +16,13 @@ export function Stats() {
     <section
       id="stats"
       aria-labelledby="stats-title"
-      className="bg-brand-light relative isolate overflow-x-clip"
+      /* The clip and the stacking context are desktop's, for the pinned
+         readout. On the phone the stage sticks, and iOS Safari only keeps a
+         sticky box on the compositor when no ancestor clips it on one axis:
+         with `overflow-x-clip` here the stage was re-placed from the main
+         thread a frame late and the whole band shook as it scrolled. The
+         stage clips its own row there, as Services' does. */
+      className="bg-brand-light relative md:isolate md:overflow-x-clip"
     >
       <h2 id="stats-title" className="sr-only">
         {STATS.srTitle}
