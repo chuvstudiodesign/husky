@@ -3,6 +3,17 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 
+declare global {
+  interface Window {
+    /** The running Lenis instance, if any. Read by ScrollSceneRoot to keep
+     *  ScrollTrigger in step with the interpolated scroll. */
+    __lenis?: Lenis;
+  }
+}
+
+/** Fired on `window` once Lenis is running and published on `window.__lenis`. */
+export const LENIS_READY_EVENT = "lenis:ready";
+
 export interface SmoothScrollProps {
   /** How long the wheel's momentum takes to settle, in seconds. */
   duration?: number;
@@ -47,6 +58,11 @@ export function SmoothScroll({
       syncTouch: false,
     });
 
+    // Published for scroll-linked scenes (see scroll-scene-root.tsx). Nothing
+    // else reads it, so other pages behave exactly as before.
+    window.__lenis = lenis;
+    window.dispatchEvent(new Event(LENIS_READY_EVENT));
+
     let frame = 0;
     const raf = (time: number) => {
       lenis.raf(time);
@@ -75,6 +91,7 @@ export function SmoothScroll({
     return () => {
       document.removeEventListener("click", onClick);
       cancelAnimationFrame(frame);
+      if (window.__lenis === lenis) delete window.__lenis;
       lenis.destroy();
     };
   }, [duration, wheelMultiplier]);

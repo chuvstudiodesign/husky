@@ -33,6 +33,13 @@ export const navigation: NavSection[] = [
       { name: "Expanding List", href: "/styleguide/modern/expanding-list" },
       { name: "Sticky Steps", href: "/styleguide/modern/sticky-steps" },
       { name: "Grain", href: "/styleguide/modern/grain" },
+      { name: "Scroll Scenes", href: "/styleguide/modern/scroll-scenes" },
+      { name: "Scrub Text", href: "/styleguide/modern/scrub-text" },
+      { name: "Cable Segment", href: "/styleguide/modern/cable-segment" },
+      { name: "Scrub Odometer", href: "/styleguide/modern/scrub-odometer" },
+      { name: "Cursor Light", href: "/styleguide/modern/cursor-light" },
+      { name: "Roll Text", href: "/styleguide/modern/roll-text" },
+      { name: "Spotlight Frame", href: "/styleguide/modern/spotlight-frame" },
     ],
   },
   {
